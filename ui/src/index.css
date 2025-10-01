@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+body {
+  @apply mx-auto my-10 p-2 max-w-6xl;
+  background-color: #e4f9f3;
+  /* @apply bg-cover bg-no-repeat;
+  background-image: url(/images/background.jpg); */
+
+  background-color: #e4f9f3;
+  background-image: url(/images/background.jpg);
+  background-repeat: repeat-y;
+  background-position: center top;
+  background-size: 100vw auto;
+}
+
+@layer components {
+  h1 {
+    @apply text-4xl font-semibold;
+    font-family: "Dancing Script", cursive;
+    color: #6e489b;
+  }
+  h5 {
+    font-family: "Roboto Condensed", sans-serif;
+    @apply text-xl mt-1 mb-2 h-14;
+  }
+
+  .btn {
+    @apply bg-slate-100 text-slate-600 ring-1 ring-slate-700/10 hover:bg-slate-200
+            rounded-lg px-4 py-2 text-center font-medium hover:no-underline
+            shadow-lg hover:shadow-none transition-shadow;
+  }
+
+  .input {
+    @apply block w-full px-4 py-2 m-0 text-base font-normal bg-clip-padding rounded-lg border border-solid shadow-md shadow-gray-300;
+    @apply text-gray-700 bg-gray-100/70 border-gray-300;
+    @apply focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none;
+    @apply transition ease-in-out;
+    /* display: block;
+    width: 100%;
+    min-height: 50px;
+    padding: 12px 19px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 24px;
+    color: #737576;
+    background-color: #f5f5f5;
+    background-image: none;
+    border-radius: 0;
+    transition: 0.3s ease-in-out;
+    font-family: "Oswald", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+      Arial, sans-serif;
+    border: 1px solid #f5f5f5; */
+  }
+
+  button[role="checkbox"] {
+    @apply flex size-[25px] appearance-none items-center justify-center rounded shadow-md shadow-gray-300 outline-none hover:bg-violet-200;
+    @apply bg-white border border-gray-300 hover:border-gray-300 focus:border-blue-600;
+    /*
+    all: unset;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    width: 25px;
+    height: 25px;
+    background-color: white;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+    */
+  }
+  /*
+  }
+  .btn-lg {
+    @apply px-6 py-3;
+  }
+  .btn-danger {
+    @apply bg-red-300 text-red-700 ring-1 ring-red-700/10 hover:bg-red-400;
+  }
+
+  input[readonly] {
+    background-color: #ccc;
+  }
+  .form-control {
+    @apply shadow-sm appearance-none border w-full py-2 px-3 text-slate-700 leading-tight focus:outline-none rounded-md border-slate-300 mb-4;
+  }
+  .form-control.mb-sm {
+    @apply mb-0;
+  }
+  .form-group {
+    @apply mb-4;
+  }
+
+  .w-auto {
+    width: auto !important;
+  }
+  input[type="checkbox"] {
+    @apply mr-2 p-3 rounded-md text-slate-700;
+  }
+
+  ul.autocomplete-results {
+    @apply shadow-sm appearance-none border w-full py-2 text-slate-700 rounded-md border-slate-300 mb-4 -mt-4;
+  }
+  ul.autocomplete-results li {
+    @apply hover:bg-slate-300 cursor-pointer px-3;
+  }
+
+  .is-invalide {
+    @apply border-red-500 bg-red-50;
+  }
+  .invalid-feedback {
+    @apply font-bold text-sm text-red-600 -mt-4 mb-4 p-1;
+  }
+
+  .alert-close {
+    @apply absolute top-0 right-0 text-3xl cursor-pointer px-2;
+  }
+  */
+}

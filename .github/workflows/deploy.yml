@@ -1,0 +1,55 @@
+name: Deploy to Infomaniak
+
+on:
+  push:
+    branches: [main]  # or your deployment branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 🧱 Build UI
+        working-directory: ui
+        run: |
+          npm ci
+          npm run build
+
+      - name: ⚙️ Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+
+      - name: 🧱 Install Composer deps
+        working-directory: api
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: 🚀 Deploy via SSH
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ vars.DEPLOY_HOST }}
+          username: ${{ vars.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: 22
+          source: |
+            ui/dist/*
+            api/*
+          target: ${{ vars.DEPLOY_DIR }}
+
+      - name: 🔄 Run Laravel migration
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ vars.DEPLOY_HOST }}
+          username: ${{ vars.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            cd ${{ vars.DEPLOY_DIR }}/api
+            php artisan migrate --force
