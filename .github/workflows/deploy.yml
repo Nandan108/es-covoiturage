@@ -2,12 +2,12 @@ name: Deploy to Infomaniak
 
 on:
   push:
-    branches: [main]  # or your deployment branch
+    branches: [main] # or your deployment branch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    environment: Infomaniak hosting
     steps:
       - name: ⬇️ Checkout
         uses: actions/checkout@v4
@@ -23,33 +23,32 @@ jobs:
           npm ci
           npm run build
 
-      - name: ⚙️ Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-
-      - name: 🧱 Install Composer deps
-        working-directory: api
-        run: composer install --no-dev --optimize-autoloader
-
-      - name: 🚀 Deploy via SSH
+      - name: 🚀 Upload UI to /public
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ vars.DEPLOY_HOST }}
           username: ${{ vars.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           port: 22
-          source: |
-            ui/dist/*
-            api/*
-          target: ${{ vars.DEPLOY_DIR }}
+          source: ui/dist/*
+          target: ${{ vars.DEPLOY_DIR }}/public
 
-      - name: 🔄 Run Laravel migration
+      - name: 🚀 Git fetch and reset on server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ vars.DEPLOY_HOST }}
           username: ${{ vars.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            cd ${{ vars.DEPLOY_DIR }}/api
-            php artisan migrate --force
+            cd ${{ vars.DEPLOY_DIR }}
+            git fetch origin
+            git reset --hard origin/main
+            cd api
+            /opt/php8.4/bin/composer install --no-dev --optimize-autoloader
+            /opt/php8.4/bin/php artisan migrate --force
+            /opt/php8.4/bin/php artisan config:clear
+            /opt/php8.4/bin/php artisan config:cache
+            /opt/php8.4/bin/php artisan route:clear
+            /opt/php8.4/bin/php artisan route:cache
+            /opt/php8.4/bin/php artisan view:clear
+            /opt/php8.4/bin/php artisan view:cache

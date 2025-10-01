@@ -1,0 +1,11 @@
+*.log
+.DS_Store
+.env
+.env.backup
+.env.production
+.htaccess
+
+# Ignore built frontend files copied to public/
+public/*
+!public/.htaccess
+!public/.api-index.php

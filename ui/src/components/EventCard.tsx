@@ -43,7 +43,7 @@ function EventCard({ className, e }: { className?: string; e: EventSummary }) {
       >
         <Link to={`/events/${e.hashId}`} className="flex flex-col @sm:flex-row">
           <img
-            src={`http://127.0.0.1:8000/images/${e.image_id}`}
+            src={`http://127.0.0.1:8000/api/images/${e.image_id}`}
             alt={e.name}
             className="w-full object-cover @sm:max-w-52"
             loading="lazy"

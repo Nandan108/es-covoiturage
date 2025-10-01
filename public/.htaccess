@@ -1,0 +1,12 @@
+RewriteEngine On
+
+# 1. Send /api/* to Laravel
+RewriteCond %{REQUEST_URI} ^/api
+RewriteRule ^api(/.*)?$ api-index.php [L]
+
+# 2. Serve static files from /ui directly (images, js, css, etc.) if they exist
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule . - [L]
+
+# 3. Otherwise, fallback to React app
+RewriteRule ^ index.html [L]
