@@ -31,7 +31,8 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           port: 22
           source: ui/dist/*
-          target: ${{ vars.DEPLOY_DIR }}/public
+          # Looks like it copies ui/dist/* to /public/ui/dist/* on server
+          target: ${{ vars.DEPLOY_DIR }}
 
       - name: 🚀 Git fetch and reset on server
         uses: appleboy/ssh-action@master
@@ -41,8 +42,10 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
             cd ${{ vars.DEPLOY_DIR }}
+            rm -rf public/ # Clear out old files
             git fetch origin
-            git reset --hard origin/main
+            git reset --hard origin/main # public/ is re-created from repo
+            mv ui/dist/* public/ # Move built files to public/
             cd api
             /opt/php8.4/bin/composer install --no-dev --optimize-autoloader
             /opt/php8.4/bin/php artisan migrate --force

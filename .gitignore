@@ -8,4 +8,4 @@
 # Ignore built frontend files copied to public/
 public/*
 !public/.htaccess
-!public/.api-index.php
+!public/api-index.php
