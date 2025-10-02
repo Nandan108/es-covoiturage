@@ -24,6 +24,6 @@ Route::patch('events/{event}/offers/{offer}', [OfferController::class, 'update']
 // Offers as resource nested in events
 Route::resource('events.offers', OfferController::class);
 
-    // Route::post('offers', [OfferController::class, 'store']);
-// Route::patch('offers/{offer}', [OfferController::class, 'update']);
-// Route::delete('offers/{offer}', [OfferController::class, 'destroy']);
+// Images served from DB storage
+Route::resource('images', ImageController::class)
+    ->only(['show']);

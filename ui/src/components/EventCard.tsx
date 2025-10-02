@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import type { EventSummary } from "../types";
+import { getImageUrl } from "../store/api";
 
 /* php
     public function formatedDateRange()
@@ -12,6 +13,8 @@ import type { EventSummary } from "../types";
             ' au ' . $end->translatedFormat('j F');
     }
 */
+
+
 
 function formatedDateRange(e: EventSummary) {
   const start = new Date(e.start_date);
@@ -43,7 +46,7 @@ function EventCard({ className, e }: { className?: string; e: EventSummary }) {
       >
         <Link to={`/events/${e.hashId}`} className="flex flex-col @sm:flex-row">
           <img
-            src={`http://127.0.0.1:8000/api/images/${e.image_id}`}
+            src={getImageUrl(e.image_id)}
             alt={e.name}
             className="w-full object-cover @sm:max-w-52"
             loading="lazy"

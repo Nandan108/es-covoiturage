@@ -140,3 +140,14 @@ export const {
   useUpdateOfferMutation,
   useDeleteOfferMutation,
 } = api;
+
+export function getApiUrl(path: string) {
+  const base = import.meta.env.DEV
+    ? "http://127.0.0.1:8000/api" // DEV: Laravel dev server
+    : "/api"; // PROD: /api → same origin
+  return `${base}/${path.replace(/^\/+/, "")}`;
+}
+
+export function getImageUrl(id: string | number) {
+  return getApiUrl(`images/${id}`);
+}
