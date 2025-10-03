@@ -1,7 +1,6 @@
 import { useGetEventQuery } from "../store/api";
 import { useParams } from 'react-router-dom';
 import type { HashId } from "../types";
-import "leaflet/dist/leaflet.css";
 
 import EventDetailBody from "../components/EventDetailBody";
 

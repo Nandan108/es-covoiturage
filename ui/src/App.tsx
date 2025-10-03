@@ -3,9 +3,9 @@ import { Suspense } from "react";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import { store } from "./store/store";
 import eventDetailLoader from "./pages/EventDetail.loader";
-import EventDetail from "./pages/EventDetail";
 import PageHeader from "./components/PageHeader";
 import ErrorBoundary from "./pages/Error";
+
 
 const router = createBrowserRouter([
   {
@@ -40,8 +40,14 @@ const router = createBrowserRouter([
           {
             // index: true,
             path: "",
-            Component: EventDetail,
-            loader: eventDetailLoader,
+            lazy: async () => {
+              const page = await import("./pages/EventDetail");
+              const data = await import("./pages/EventDetail.loader");
+              return {
+                Component: page.default,
+                loader: data.default,
+              };
+            },
           },
           {
             path: "offers/new",

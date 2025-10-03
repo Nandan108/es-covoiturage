@@ -1,6 +1,7 @@
 // src/components/map/EventMap.tsx
 import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 import type L from "leaflet";
 import { L as Leaflet } from "./markerIcons";
 import BoundsWatcher from "./BoundsWatcher";
