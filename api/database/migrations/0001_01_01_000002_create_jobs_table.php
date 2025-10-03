@@ -34,15 +34,21 @@ return new class extends Migration
             $table->integer('finished_at')->nullable();
         });
 
-        Schema::create('failed_jobs', function (Blueprint $table) {
-            $table->id();
-            $table->string('uuid')->unique();
-            $table->text('connection');
-            $table->text('queue');
-            $table->longText('payload');
-            $table->longText('exception');
-            $table->timestamp('failed_at')->useCurrent();
-        });
+        // create `failed_jobs` if not exists
+        if (!Schema::hasTable('failed_jobs')) {
+            Schema::create('failed_jobs', function (Blueprint $table) {
+                $table->id();
+                $table->string('uuid')->unique();
+                $table->text('connection');
+                $table->text('queue');
+                $table->longText('payload');
+                $table->longText('exception');
+                $table->timestamp('failed_at')->useCurrent();
+            });
+        }
+
+        // delete from migrations where migration = '2019_08_19_000000_create_failed_jobs_table'
+        DB::table('migrations')->where('migration', '2019_08_19_000000_create_failed_jobs_table')->delete();
     }
 
     /**
