@@ -176,6 +176,10 @@ class Event extends Model
             // helper to import event image
             $importImage = function () use ($eventData) {
                 $imgUrl     = config('app.main_site') . $eventData['pic_url'];
+                // if $imgUrl doesn't start with https://eveilspirituel.net/, prepend it
+                if (!preg_match('/^https?:\/\/eveilspirituel\.net\//', $imgUrl)) {
+                    $imgUrl = 'https://eveilspirituel.net' . $eventData['pic_url'];
+                }
                 $imgContent = file_get_contents($imgUrl);
 
                 return Image::create([
