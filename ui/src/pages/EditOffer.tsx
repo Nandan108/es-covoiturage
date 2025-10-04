@@ -1,6 +1,5 @@
-// import { useRouteLoaderData } from 'react-router-dom';
 import OfferForm from '../components/OfferForm';
-import { useParams } from 'react-router-dom';
+import { useParams } from "react-router";
 import { useGetEventQuery } from "../store/api";
 import type { HashId, Offer } from "../types";
 

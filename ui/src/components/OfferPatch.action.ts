@@ -1,4 +1,4 @@
-import { redirect, type ActionFunctionArgs } from "react-router-dom";
+import { redirect, type ActionFunctionArgs } from "react-router";
 import type { HashId } from "../types";
 import { store } from "../store/store";
 import { api } from "../store/api";

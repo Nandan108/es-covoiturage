@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import type { EventSummary } from "../types";
 import { getImageUrl } from "../store/api";
 

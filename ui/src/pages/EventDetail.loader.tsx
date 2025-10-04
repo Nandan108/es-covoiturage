@@ -1,5 +1,5 @@
 // ui/src/pages/EventDetail.tsx
-import { type LoaderFunctionArgs } from "react-router-dom";
+import { type LoaderFunctionArgs } from "react-router";
 import { store } from "../store/store";
 import { api } from "../store/api";
 import type { HashId } from "../types";

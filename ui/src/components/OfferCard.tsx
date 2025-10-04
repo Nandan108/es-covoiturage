@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import type { Offer } from "../types";
 
 import { MdOutlineLocationSearching } from "react-icons/md";

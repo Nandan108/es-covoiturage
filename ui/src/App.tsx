@@ -1,6 +1,6 @@
 import { Provider } from "react-redux";
 import { Suspense } from "react";
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router";
 import { store } from "./store/store";
 import eventDetailLoader from "./pages/EventDetail.loader";
 import PageHeader from "./components/PageHeader";
