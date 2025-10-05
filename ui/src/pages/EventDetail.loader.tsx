@@ -1,4 +1,3 @@
-// ui/src/pages/EventDetail.tsx
 import { type LoaderFunctionArgs } from "react-router";
 import { store } from "../store/store";
 import { api } from "../store/api";
@@ -8,11 +7,11 @@ export default async function loader({ params }: LoaderFunctionArgs) {
   const hashId = params.id as HashId;
   const sub = store.dispatch(api.endpoints.getEvent.initiate(hashId));
   try {
-    await sub.unwrap();
+    const event = await sub.unwrap();
+    return event;
   } catch {
     throw new Response("Désolé, cet événement est introuvable", { status: 404 });
   } finally {
     sub.unsubscribe();
   }
-  return null;
 }

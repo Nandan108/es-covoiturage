@@ -1,16 +1,14 @@
-import OfferForm from '../components/OfferForm';
-import { useParams } from "react-router";
-import { useGetEventQuery } from "../store/api";
+import OfferForm from "../components/OfferForm";
+import { useParams, useRouteLoaderData } from "react-router";
+import type { EventDetail, Offer } from "../types";
 import { throwError } from "../utils";
 
 export default function EditOffer() {
   // get event from parent route loader data
-  // const loaderData = useRouteLoaderData('event-detail');
+  const event = useRouteLoaderData("event-detail") as EventDetail;
 
-  const { id: eventHash, offerId: offerIdString } = useParams();
+  const { offerId: offerIdString } = useParams();
   const offerId = Number(offerIdString);
-
-  const { data: event } = useGetEventQuery(eventHash as HashId);
 
   const offer = event?.offers.find((o: Offer) => o.id === offerId);
 
@@ -19,5 +17,5 @@ export default function EditOffer() {
     throwError("Désolé, cette offre est introuvable", 404);
   }
 
-  return <OfferForm offer={offer} event={event}/>;
+  return <OfferForm offer={offer} event={event} />;
 }

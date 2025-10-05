@@ -42,10 +42,9 @@ const router = createBrowserRouter([
             path: "",
             lazy: async () => {
               const page = await import("./pages/EventDetail");
-              const data = await import("./pages/EventDetail.loader");
               return {
                 Component: page.default,
-                loader: data.default,
+                loader: eventDetailLoader,
               };
             },
           },

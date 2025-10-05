@@ -19,3 +19,4 @@
 # DONE!
 1. Set up CI/CD
 12. Fix: Unify error handling (i.e. leverage ErrorBoundary)
+13. Refact: use loader's return values rather than re-query

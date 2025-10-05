@@ -1,16 +1,15 @@
-import { useGetEventQuery } from "../store/api";
-import { useParams } from 'react-router';
-import type { HashId } from "../types";
+import { useLoaderData } from 'react-router';
+import { type EventDetail } from "../types";
 import { throwError } from '../utils';
 
 import EventDetailBody from "../components/EventDetailBody";
 
 export default function EventDetail() {
-  const { id } = useParams<{ id: string }>();
-  const { data: event } = useGetEventQuery(id as HashId);
+  const event = useLoaderData() as EventDetail;
+
   if (!event) {
     throwError("Désolé, cet événement est introuvable", 404);
   }
 
-  return <EventDetailBody {...{ event }} />;
+  return <EventDetailBody event={event} />;
 }
