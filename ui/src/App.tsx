@@ -4,7 +4,7 @@ import { createBrowserRouter, Outlet, RouterProvider } from "react-router";
 import { store } from "./store/store";
 import eventDetailLoader from "./pages/EventDetail.loader";
 import PageHeader from "./components/PageHeader";
-import ErrorBoundary from "./pages/Error";
+import ErrorBoundary from "./pages/ErrorBoundary";
 
 
 const router = createBrowserRouter([

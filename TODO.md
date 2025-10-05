@@ -1,16 +1,21 @@
 # TODO
-8. Show event name/image in offer form
-9. Show event name in page meta title
-3. Trash button on offer form in edit mode
-5. Better nav (use NavLinks)
-   * breadcrumbs
-4. Token-based security for editing offers
-2. Add unit tests (both api and ui)
-6. Translations (EN, FR)
-7. Add Admin pages
+08. Show event name/image in offer form
+09. Show event name in page meta title
+11. Fix favicon
+10. Move event images to file storage for static serving
+03. Trash button on offer form in edit mode
+05. Better nav (use NavLinks)
+    * breadcrumbs
+04. Token-based security for editing offers
+13. Make /events/:eventhash>/offers/:id navigable
+    * if offer :id doesn't exist, fall back to /offers
+02. Add unit tests (both api and ui)
+06. Translations (EN, FR)
+07. Add Admin pages
     * index (liste of events)
     * event page create mode
     * event page edit mode
 
 # DONE!
 1. Set up CI/CD
+12. Fix: Unify error handling (i.e. leverage ErrorBoundary)

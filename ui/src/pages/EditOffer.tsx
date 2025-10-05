@@ -1,7 +1,7 @@
 import OfferForm from '../components/OfferForm';
 import { useParams } from "react-router";
 import { useGetEventQuery } from "../store/api";
-import type { HashId, Offer } from "../types";
+import { throwError } from "../utils";
 
 export default function EditOffer() {
   // get event from parent route loader data
@@ -14,8 +14,9 @@ export default function EditOffer() {
 
   const offer = event?.offers.find((o: Offer) => o.id === offerId);
 
+  // throw a 404 Error if no event or offer
   if (!event || !offer) {
-    return <div>Offre introuvable</div>;
+    throwError("Désolé, cette offre est introuvable", 404);
   }
 
   return <OfferForm offer={offer} event={event}/>;

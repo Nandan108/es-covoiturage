@@ -10,7 +10,7 @@ export default async function loader({ params }: LoaderFunctionArgs) {
   try {
     await sub.unwrap();
   } catch {
-    throw new Response("Not Found", { status: 404 });
+    throw new Response("Désolé, cette offre est introuvable", { status: 404 });
   } finally {
     sub.unsubscribe();
   }

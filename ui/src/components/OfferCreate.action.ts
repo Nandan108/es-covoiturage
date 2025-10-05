@@ -2,6 +2,7 @@ import { redirect, type ActionFunctionArgs } from "react-router";
 import type { HashId } from "../types";
 import { store } from "../store/store";
 import { api } from "../store/api";
+import { throwError } from "../utils";
 
 export default async function CreateOfferAction({ params, request }: ActionFunctionArgs) {
   const eventHash = params.id as HashId;
@@ -30,7 +31,7 @@ export default async function CreateOfferAction({ params, request }: ActionFunct
   try {
     await sub.unwrap();
   } catch {
-    throw new Response("Unable to create offer", { status: 400 });
+    throwError("Unable to create offer", 400);
   } finally {
     // sub.unsubscribe();
   }

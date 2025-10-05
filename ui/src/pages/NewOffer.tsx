@@ -2,6 +2,7 @@ import { useParams } from 'react-router';
 import OfferForm from '../components/OfferForm';
 import { useGetEventQuery } from '../store/api';
 import type { HashId } from '../types';
+import { throwError } from '../utils';
 
 export default function NewOffer() {
   // get event from parent route loader data
@@ -9,7 +10,7 @@ export default function NewOffer() {
   const { data: event } = useGetEventQuery(eventHash as HashId);
 
   if (!event) {
-    return <div>Error: the event was not found</div>;
+    throwError("Désolé, cet événement est introuvable", 404);
   }
 
   return <OfferForm event={event}/>;
