@@ -4,7 +4,7 @@ import marker from "leaflet/dist/images/marker-icon.png";
 
 export function Legend({ mode = "view" }: { mode?: "view" | "edit" }) {
   return (
-    <div className="flex flex-row flex-wrap gap-x-10 gap-y-1 my-3 items-center justify-start lg:justify-between sm:text-nowrap">
+    <div className="flex flex-row flex-wrap gap-x-10 gap-y-1 my-3 items-center justify-center sm:text-nowrap">
       <div className="flex flex-col items-center sm:flex-row sm:gap-2">
         <img src={greenMan} className="inline-block" width="15" />
         <span className="text-center">Passager</span>

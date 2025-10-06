@@ -1,4 +1,4 @@
-import PageHeader from "../components/PageHeader";
+import PageHeader from "../components/layout/PageHeader";
 import { useRouteError, isRouteErrorResponse } from "react-router";
 
 function ErrorBoundary({ error }: { error?: Error }) {

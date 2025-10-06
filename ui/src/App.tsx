@@ -1,24 +1,21 @@
 import { Provider } from "react-redux";
 import { Suspense } from "react";
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router";
+import { createBrowserRouter, NavLink, RouterProvider } from "react-router";
 import { store } from "./store/store";
 import eventDetailLoader from "./pages/EventDetail.loader";
-import PageHeader from "./components/PageHeader";
 import ErrorBoundary from "./pages/ErrorBoundary";
-
+import Layout from "./components/layout/Layout";
+import type { BreadcrumbHandle } from "./types/router";
+import type { EventDetail, Offer } from "./types/types";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: (
-      <>
-        <PageHeader />
-        <main>
-          <Outlet />
-        </main>
-      </>
-    ),
+    element: <Layout />,
     errorElement: <ErrorBoundary />,
+    handle: {
+      breadcrumb: () => <NavLink to="/">Accueil</NavLink>,
+    },
     children: [
       {
         index: true,
@@ -36,6 +33,17 @@ const router = createBrowserRouter([
         path: "/events/:id",
         id: "event-detail",
         loader: eventDetailLoader,
+        handle: {
+          breadcrumb: (match) => {
+            const event = match.loaderData as EventDetail | undefined;
+            const title = event ? event.loc_name : "Événement";
+            return <NavLink to={match.pathname} title={title} end>{title}</NavLink>;
+          },
+          title: (match) => {
+            const event = match.loaderData as EventDetail | undefined;
+            return event ? event.loc_name : "Événement";
+          },
+        } as BreadcrumbHandle<EventDetail>,
         children: [
           {
             // index: true,
@@ -50,6 +58,10 @@ const router = createBrowserRouter([
           },
           {
             path: "offers/new",
+            handle: {
+              breadcrumb: (match) => <NavLink to={match.pathname}>Nouvelle offre</NavLink>,
+              title: "Nouvelle offre",
+            } as BreadcrumbHandle<Offer>,
             lazy: async () => {
               const page = await import("./pages/NewOffer");
               const action = await import("./components/OfferCreate.action");
@@ -61,6 +73,16 @@ const router = createBrowserRouter([
           },
           {
             path: "offers/:offerId/edit",
+            handle: {
+              breadcrumb: (match) => {
+                const offer = match.loaderData;
+                return <NavLink to={match.pathname}>{offer ? offer.name : "Modifier l'offre"}</NavLink>;
+              },
+              title: (match) => {
+                const offer = match.loaderData;
+                return offer ? `Modifier l'offre - ${offer.name}` : "Modifier l'offre";
+              },
+            } as BreadcrumbHandle<Offer>,
             lazy: async () => {
               const page = await import("./pages/EditOffer");
               const action = await import("./components/OfferPatch.action");

@@ -55,17 +55,13 @@ body {
   button[role="checkbox"] {
     @apply flex size-[25px] appearance-none items-center justify-center rounded shadow-md shadow-gray-300 outline-none hover:bg-violet-200;
     @apply bg-white border border-gray-300 hover:border-gray-300 focus:border-blue-600;
-    /*
-    all: unset;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    width: 25px;
-    height: 25px;
-    background-color: white;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
-    */
+  }
+
+  nav a.active {
+    @apply font-bold underline;
+  }
+  nav a:hover {
+    @apply underline;
   }
   /*
   }
