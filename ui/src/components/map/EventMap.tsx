@@ -6,7 +6,7 @@ import type L from "leaflet";
 import { L as Leaflet } from "./markerIcons";
 import BoundsWatcher from "./BoundsWatcher";
 import { iconForOffer, icons } from "./markerIcons";
-import type { Offer } from "../../types";
+import type { Offer } from "../../types/types";
 
 export type MapActions = {
   focusOffer: (

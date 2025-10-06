@@ -1,6 +1,6 @@
 import { useLoaderData } from "react-router";
 import EventCard from "../components/EventCard";
-import type { EventSummary } from "../types";
+import type { EventSummary } from "../types/types";
 
 export default function EventsList() {
   const eventList = useLoaderData() as EventSummary[];

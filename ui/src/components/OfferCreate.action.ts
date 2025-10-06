@@ -1,5 +1,5 @@
 import { redirect, type ActionFunctionArgs } from "react-router";
-import type { HashId } from "../types";
+import type { HashId } from "../types/types";
 import { store } from "../store/store";
 import { api } from "../store/api";
 import { throwError } from "../utils";

@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import type { EventSummary } from "../types";
+import type { EventSummary } from "../types/types";
 import { getImageUrl } from "../store/api";
 
 /* php

@@ -1,7 +1,7 @@
 import { useRef, useState } from "react"
 import { usePartitionOffersByBounds } from "../hooks/usePartitionOffersByBounds"
 import { OffersGrid } from "./map/OffersGrid"
-import type { EventDetail } from "../types"
+import type { EventDetail } from "../types/types"
 import EventCard from "./EventCard"
 import { Link } from "react-router"
 import { Legend } from "./map/Legend"

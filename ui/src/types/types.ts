@@ -46,3 +46,4 @@ export interface EventSummary {
 export interface EventDetail extends EventSummary {
   offers: Offer[];
 }
+

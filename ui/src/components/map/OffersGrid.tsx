@@ -1,4 +1,4 @@
-import type { Offer } from "../../types";
+import type { Offer } from "../../types/types";
 import OfferCard from "../OfferCard";
 
 export function OffersGrid({

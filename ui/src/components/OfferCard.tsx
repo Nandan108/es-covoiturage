@@ -1,6 +1,7 @@
 import { Link } from "react-router";
-import type { Offer } from "../types";
+import type { Offer } from "../types/types";
 
+// icons
 import { MdOutlineLocationSearching } from "react-icons/md";
 import { ImBubble2 } from "react-icons/im";
 import { FaRegEdit } from "react-icons/fa";

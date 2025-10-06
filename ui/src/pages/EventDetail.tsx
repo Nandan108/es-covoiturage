@@ -1,5 +1,5 @@
 import { useLoaderData } from 'react-router';
-import { type EventDetail } from "../types";
+import { type EventDetail } from '../types/types';
 import { throwError } from '../utils';
 
 import EventDetailBody from "../components/EventDetailBody";
