@@ -1,8 +1,8 @@
 // ui/src/hooks/usePartitionOffersByBounds.ts
 import { useMemo } from "react";
-import type { Offer } from "../types/types";
-import type { LatLngBounds } from "../components/map/markerIcons";
-import { L } from "../components/map/markerIcons";
+import type { Offer } from "@/types/types";
+import type { LatLngBounds } from "@/components/map/markerIcons";
+import { L } from "@/components/map/markerIcons";
 
 /**
  * Split offers into those currently inside the map bounds vs outside.

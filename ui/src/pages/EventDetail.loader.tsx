@@ -1,7 +1,7 @@
 import { type LoaderFunctionArgs } from "react-router";
-import { store } from "../store/store";
-import { api } from "../store/api";
-import type { HashId } from "../types/types";
+import { store } from "@/store/store";
+import { api } from "@/store/api";
+import type { HashId } from "@/types/types";
 
 export default async function loader({ params }: LoaderFunctionArgs) {
   const hashId = params.id as HashId;

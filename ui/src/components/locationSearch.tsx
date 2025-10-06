@@ -1,7 +1,7 @@
 // LocationSearch.tsx
 import { useState } from "react";
-import { useDebounce } from "../hooks/useDebounce";
-import { useAutocompleteQuery, type Loc } from "../services/locationApi";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useAutocompleteQuery, type Loc } from "@/services/locationApi";
 import AutocompleteInput from "./AutocompleteInput";
 
 type Props = {

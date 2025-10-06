@@ -1,7 +1,7 @@
 // ui/src/store/store.ts
 import { configureStore } from "@reduxjs/toolkit";
 import { api as storeApi } from "./api";
-import { locationApi } from "../services/locationApi"; // RTKQ service
+import { locationApi } from "@/services/locationApi"; // RTKQ service
 
 export const store = configureStore({
   reducer: {

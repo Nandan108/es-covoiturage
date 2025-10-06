@@ -1,6 +1,6 @@
 // ui/src/store/api.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { EventSummary, EventDetail, Offer, HashId } from "../types/types";
+import type { EventSummary, EventDetail, Offer, HashId } from "@/types/types";
 
 export const api = createApi({
   reducerPath: "api",

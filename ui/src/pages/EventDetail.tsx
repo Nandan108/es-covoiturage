@@ -1,8 +1,8 @@
 import { useLoaderData } from 'react-router';
-import { type EventDetail } from '../types/types';
-import { throwError } from '../utils';
+import { type EventDetail } from '@/types/types';
+import { throwError } from '@/utils';
 
-import EventDetailBody from "../components/EventDetailBody";
+import EventDetailBody from "@/components/EventDetailBody";
 
 export default function EventDetail() {
   const event = useLoaderData() as EventDetail;

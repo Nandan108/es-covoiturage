@@ -2,6 +2,7 @@ import { defineConfig, type PluginOption } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import tailwind from "@tailwindcss/vite";
 import { visualizer } from "rollup-plugin-visualizer";
+import path from "path";
 
 // import path from 'node:path'
 
@@ -19,6 +20,9 @@ export default defineConfig({
   },
   resolve: {
     dedupe: ["leaflet", "react", "react-dom"],
+    alias: {
+      "@": path.resolve(__dirname, "src"),
+    },
   },
   optimizeDeps: {
     include: ["leaflet"], // pre-bundle it once

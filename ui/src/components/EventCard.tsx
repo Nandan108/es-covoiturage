@@ -1,20 +1,6 @@
 import { Link } from "react-router";
-import type { EventSummary } from "../types/types";
-import { getImageUrl } from "../store/api";
-
-/* php
-    public function formatedDateRange()
-    {
-        $start = CarbonImmutable::parse($this->start_date);
-        $end   = $start->addDays($this->days - 1);
-        $sameMonth = $start->month === $end->month;
-
-        return $start->translatedFormat($sameMonth ? 'j' : 'j F') .
-            ' au ' . $end->translatedFormat('j F');
-    }
-*/
-
-
+import type { EventSummary } from "@/types/types";
+import { getImageUrl } from "@/store/api";
 
 function formatedDateRange(e: EventSummary) {
   const start = new Date(e.start_date);

@@ -1,5 +1,5 @@
 import { Form } from "react-router";
-import type { Offer, EventDetail } from "../types/types";
+import type { Offer, EventDetail } from "@/types/types";
 import OfferRoles from "./OfferRoles";
 import EventMap, { type MapActions } from "./map/EventMap";
 import { useRef, useState } from "react";

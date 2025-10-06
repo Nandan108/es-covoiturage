@@ -1,10 +1,6 @@
 # TODO
-08. Show event name/image in offer form
-09. Show event name in page meta title
 10. Move event images to file storage for static serving
 03. Trash button on offer form in edit mode
-05. Better nav (use NavLinks)
-    * breadcrumbs
 04. Token-based security for editing offers
 13. Make /events/:eventhash>/offers/:id navigable
     * if offer :id doesn't exist, fall back to /offers
@@ -16,7 +12,11 @@
     * event page edit mode
 
 # DONE!
-1. Set up CI/CD
+01. Set up CI/CD
 12. Fix: Unify error handling (i.e. leverage ErrorBoundary)
 13. Refact: use loader's return values rather than re-query
 11. Fix favicon
+05. Better nav (use NavLinks)
+    * breadcrumbs
+08. Show event name/image in offer form
+09. Show event name in page meta title

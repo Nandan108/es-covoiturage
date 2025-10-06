@@ -1,8 +1,8 @@
 import { redirect, type ActionFunctionArgs } from "react-router";
-import type { HashId } from "../types/types";
-import { store } from "../store/store";
-import { api } from "../store/api";
-import { throwError } from "../utils";
+import type { HashId } from "@/types/types";
+import { store } from "@/store/store";
+import { api } from "@/store/api";
+import { throwError } from "@/utils";
 
 export default async function CreateOfferAction({ params, request }: ActionFunctionArgs) {
   const eventHash = params.id as HashId;

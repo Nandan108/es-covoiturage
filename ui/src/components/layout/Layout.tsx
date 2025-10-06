@@ -1,4 +1,4 @@
-import { useDynamicTitle } from "../../hooks/useDynamicTitle";
+import { useDynamicTitle } from "@/hooks/useDynamicTitle";
 import { Outlet } from "react-router";
 import PageHeader from "./PageHeader";
 

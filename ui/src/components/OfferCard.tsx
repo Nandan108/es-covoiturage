@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import type { Offer } from "../types/types";
+import type { Offer } from "@/types/types";
 
 // icons
 import { MdOutlineLocationSearching } from "react-icons/md";

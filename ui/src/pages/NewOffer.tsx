@@ -1,7 +1,7 @@
 import { useRouteLoaderData } from 'react-router';
-import OfferForm from '../components/OfferForm';
-import type { EventDetail } from '../types/types';
-import { throwError } from '../utils';
+import OfferForm from '@/components/OfferForm';
+import type { EventDetail } from '@/types/types';
+import { throwError } from '@/utils';
 
 export default function NewOffer() {
   // get event from parent route loader data

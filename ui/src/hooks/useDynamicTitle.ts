@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useMatches } from "react-router";
 import type { UIMatch } from "react-router";
-import type { BreadcrumbHandle } from "../types/router";
+import type { BreadcrumbHandle } from "@/types/router";
 
 export function useDynamicTitle(base: string = "Home") {
   const matches = useMatches() as UIMatch<unknown, BreadcrumbHandle>[];
