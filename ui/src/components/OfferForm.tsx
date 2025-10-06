@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 import Leaflet from "leaflet";
 import LocationSearch from "./locationSearch";
 import { Legend } from "./map/Legend";
+import EventCard from "./EventCard";
 // import type { AutocompleteInputHandle } from "./AutocompleteInput";
 
 export default function OfferForm({ event, offer }: { event: EventDetail; offer?: Offer }) {
@@ -44,6 +45,7 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
 
   return (
     <div className="mx-auto p-4">
+      <EventCard e={event} className="mb-6" />
       <h1 className="text-2xl font-semibold mb-4">
         {editing ? "Modifier une offre" : "Nouvelle offre / demande"}
       </h1>
