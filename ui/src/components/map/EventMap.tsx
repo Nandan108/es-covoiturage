@@ -133,7 +133,7 @@ const EventMap = forwardRef<MapActions, Props>(function (
 
     if (position) {
       return (
-        <Marker position={position}>
+        <Marker position={position} icon={icons.default}>
           <Popup>{popupContent}</Popup>
         </Marker>
       );

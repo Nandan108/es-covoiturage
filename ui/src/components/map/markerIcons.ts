@@ -5,6 +5,8 @@ import greenMan from '@/assets/markers/green-man.png'
 import eventMarker from '@/assets/markers/marker-icon_red.png'
 import eventMarkerRetina from '@/assets/markers/marker-icon_red-2x.png'
 import eventMarkerShadow from '@/assets/markers/marker-shadow.png'
+import defaultMarker from '@/assets/markers/marker-icon.png'
+import defaultMarkerRetina from '@/assets/markers/marker-icon-2x.png'
 
 export const icons = {
   event: L.icon({ iconUrl: eventMarker, iconRetinaUrl: eventMarkerRetina, shadowUrl: eventMarkerShadow,
@@ -12,6 +14,8 @@ export const icons = {
   driver: L.icon({ iconUrl: redCar, iconRetinaUrl: redCar, iconSize: [50,26], iconAnchor: [25,23], popupAnchor: [1,-10] }),
   passenger: L.icon({ iconUrl: greenMan, iconRetinaUrl: greenMan, iconSize: [26,50], iconAnchor: [13,48], popupAnchor: [1,-34] }),
   both: L.icon({ iconUrl: lightblueCar, iconRetinaUrl: lightblueCar, iconSize: [50,26], iconAnchor: [25,23], popupAnchor: [1,-10] }),
+  default: L.icon({ iconUrl: defaultMarker, iconRetinaUrl: defaultMarkerRetina, shadowUrl: eventMarkerShadow,
+    shadowSize: [41,41], iconSize: [25,41], iconAnchor: [12,41], popupAnchor: [1,-34] }),
 }
 
 export function iconForOffer(o: { driver_seats: number; pasngr_seats: number }) {
