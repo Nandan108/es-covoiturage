@@ -7,6 +7,18 @@ import { throwError } from "@/utils";
 export default async function action({ params, request }: ActionFunctionArgs) {
   const eventHash = params.id as HashId;
 
+  if (request.method === "DELETE") {
+    const formData = await request.formData();
+    const id = formData.get("id");
+    const sub = store.dispatch(api.endpoints.deleteOffer.initiate({ id: Number(id), eventHash, token: '' }));
+    try {
+      await sub.unwrap();
+      console.log("Offer deleted successfully");
+    } catch {
+      throw new Response("Une erreur est survenue lors de la suppression de l'offre", { status: 500 });
+    }
+  }
+
   // get form data
   const formData = await request.formData();
   const entries = Object.fromEntries(formData.entries());

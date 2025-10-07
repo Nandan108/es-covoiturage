@@ -1,4 +1,4 @@
-import { Form } from "react-router";
+import { Form, useFetcher, useNavigate } from "react-router";
 import type { Offer, EventDetail } from "@/types/types";
 import OfferRoles from "./OfferRoles";
 import EventMap, { type MapActions } from "./map/EventMap";
@@ -7,10 +7,9 @@ import Leaflet from "leaflet";
 import LocationSearch from "./locationSearch";
 import { Legend } from "./map/Legend";
 import EventCard from "./EventCard";
-// import type { AutocompleteInputHandle } from "./AutocompleteInput";
+import { FaTrash } from "react-icons/fa";
 
 export default function OfferForm({ event, offer }: { event: EventDetail; offer?: Offer }) {
-  // const [bounds, setBounds] = useState<L.LatLngBounds | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const addressRef = useRef<HTMLInputElement>(null);
   const [latLng, setLatLng] = useState<L.LatLng | null>(
@@ -20,6 +19,20 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
   const editing = offer != null;
   const mapRef = useRef<MapActions>(null);
   const locationSearchRef = useRef<HTMLInputElement>(null);
+
+  const fetcher = useFetcher();
+  const navigate = useNavigate();
+
+  const handleDelete = async () => {
+    if (!offer) return;
+    if (!confirm("Supprimer cette offre ?")) return;
+
+    await fetcher.submit(
+      { id: offer.id, eventHash: event.hashId },
+      { method: "delete", action: `/events/${event.hashId}/offers/${offer.id}/edit` }
+    );
+    navigate(`/events/${event.hashId}`);
+  };
 
   const form = {
     eventHash: event.hashId,
@@ -155,10 +168,15 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
           </label>
         </div> */}
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 justify-between">
           <button type="submit" className="btn">
             {editing ? "Enregistrer" : "Créer"}
           </button>
+          {editing && (
+            <button className="btn bg-red-200" onClick={handleDelete} type="button" title="Supprimer cette offre">
+              <FaTrash className="inline text-red-800" />
+            </button>
+          )}
         </div>
       </Form>
     </div>
