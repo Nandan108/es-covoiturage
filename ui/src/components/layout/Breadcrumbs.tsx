@@ -1,7 +1,7 @@
 // src/components/Breadcrumbs.tsx
 import { useMatches, type UIMatch } from "react-router";
 import { Fragment } from "react";
-import type { BreadcrumbHandle } from "../../types/router";
+import type { BreadcrumbHandle } from "@/types/router";
 import { lightblueCar } from "../map/markerIcons";
 
 export default function Breadcrumbs() {
@@ -13,8 +13,6 @@ export default function Breadcrumbs() {
       const Breadcrumb = match.handle.breadcrumb;
       return <Fragment key={index}>{Breadcrumb!(match)}</Fragment>;
     });
-
-  console.log("matches", matches);
 
   return (
     <nav className="py-2 px-4 text-sm text-gray-600 flex flex-wrap items-center gap-1">

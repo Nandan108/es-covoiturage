@@ -2,6 +2,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { EventSummary, EventDetail, Offer, HashId } from "@/types/types";
 
+export type Api = typeof api;
+
 export const api = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
@@ -75,22 +77,21 @@ export const api = createApi({
     updateOffer: b.mutation<
       Offer,
       {
-        id: number;
+        offerId: number;
         eventHash: HashId;
-        token: string;
         patch: Partial<Omit<Offer, "id" | "event_id" | "created_at">>;
       }
     >({
-      query: ({ id, eventHash, token, patch }) => ({
-        url: `events/${eventHash}/offers/${id}`,
+      query: ({ offerId, eventHash, patch }) => ({
+        url: `events/${eventHash}/offers/${offerId}`,
         method: "PATCH",
         body: patch,
-        headers: { "X-Offer-Token": token },
+        headers: { "X-Offer-Token": "some-token", "Accept": "application/json" }, // TODO: pass real token
       }),
-      async onQueryStarted({ id, eventHash, patch }, { dispatch, queryFulfilled }) {
+      async onQueryStarted({ offerId, eventHash, patch }, { dispatch, queryFulfilled }) {
         const prev = dispatch(
           api.util.updateQueryData("getEvent", eventHash, (draft) => {
-            const o = draft.offers.find((o) => o.id === id);
+            const o = draft.offers.find((o) => o.id === offerId);
             if (o) Object.assign(o, patch, { updated_at: new Date().toISOString() });
           })
         );
@@ -102,12 +103,12 @@ export const api = createApi({
       },
     }),
 
-    deleteOffer: b.mutation<{ success: boolean }, { id: number; eventHash: HashId; token: string }>(
+    deleteOffer: b.mutation<{ success: boolean }, { id: number; eventHash: HashId }>(
       {
-        query: ({ id, eventHash, token }) => ({
+        query: ({ id, eventHash }) => ({
           url: `events/${eventHash}/offers/${id}`,
           method: "DELETE",
-          headers: { "X-Offer-Token": token },
+          headers: { "X-Offer-Token": "some-token" }, // TODO: pass real token
         }),
         async onQueryStarted({ id, eventHash }, { dispatch, queryFulfilled }) {
           const patchEvent = dispatch(

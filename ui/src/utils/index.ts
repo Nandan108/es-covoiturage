@@ -5,3 +5,5 @@
 export function throwError(message: string, status = 404): never {
   throw new Error(message, { cause: { status } });
 }
+
+export { runMutation, runQuery } from "./runApi";

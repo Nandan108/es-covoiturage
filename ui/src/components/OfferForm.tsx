@@ -1,4 +1,4 @@
-import { Form, useFetcher, useNavigate } from "react-router";
+import { Form, useFetcher, useNavigation } from "react-router";
 import type { Offer, EventDetail } from "@/types/types";
 import OfferRoles from "./OfferRoles";
 import EventMap, { type MapActions } from "./map/EventMap";
@@ -21,18 +21,7 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
   const locationSearchRef = useRef<HTMLInputElement>(null);
 
   const fetcher = useFetcher();
-  const navigate = useNavigate();
-
-  const handleDelete = async () => {
-    if (!offer) return;
-    if (!confirm("Supprimer cette offre ?")) return;
-
-    await fetcher.submit(
-      { id: offer.id, eventHash: event.hashId },
-      { method: "delete", action: `/events/${event.hashId}/offers/${offer.id}/edit` }
-    );
-    navigate(`/events/${event.hashId}`);
-  };
+  const navigation = useNavigation();
 
   const form = {
     eventHash: event.hashId,
@@ -55,6 +44,9 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
     // setBounds(Leaflet.latLngBounds(Leaflet.latLng(lat, lng), Leaflet.latLng(lat, lng)));
     mapRef?.current?.centerOn(Leaflet.latLng(lat, lng));
   };
+
+  const isSubmitting = navigation.state === "submitting";
+  const isDeleting = fetcher.state === "submitting";
 
   return (
     <div className="mx-auto p-4">
@@ -169,16 +161,34 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
         </div> */}
 
         <div className="flex gap-3 justify-between">
-          <button type="submit" className="btn">
-            {editing ? "Enregistrer" : "Créer"}
+          <button type="submit" className="btn" disabled={isSubmitting || isDeleting}>
+            {isSubmitting
+              ? editing
+                ? "Enregistrement…"
+                : "Création…"
+              : editing
+              ? "Enregistrer"
+              : "Créer"}
           </button>
           {editing && (
-            <button className="btn bg-red-200" onClick={handleDelete} type="button" title="Supprimer cette offre">
-              <FaTrash className="inline text-red-800" />
+            <button
+              className="btn bg-red-200 text-red-800"
+              type="submit"
+              title="Supprimer cette offre"
+              form="delete-offer-form"
+              disabled={isDeleting || isSubmitting}
+            >
+              {isDeleting ? "Suppression…" : <FaTrash className="inline" />}
             </button>
           )}
         </div>
       </Form>
+      <fetcher.Form
+        id="delete-offer-form"
+        method="delete"
+        action={`/events/${event.hashId}/offers/${offer?.id}/edit`}
+        style={{ display: "none" }}
+      ></fetcher.Form>
     </div>
   );
 }
