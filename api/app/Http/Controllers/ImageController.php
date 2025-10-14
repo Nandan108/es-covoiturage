@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Image;
 use Illuminate\Http\Request;
 
-class ImageController extends Controller
+/** @psalm-suppress UnusedClass */
+final class ImageController extends Controller
 {
     /**
      * Store a newly created resource in storage.
+     *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function store(Request $request)
     {
@@ -16,32 +19,24 @@ class ImageController extends Controller
             'image' => 'required|image|mimes:png,jpg,jpeg,webp|max:2048',
         ]);
 
-        $imageName = time() . '.' . $request->image->extension();
+        $imageName = time().'.'.$request->image->extension();
 
         // Public Folder
         $request->image->move(public_path('images'), $imageName);
-
-        // //Store in Storage Folder
-        // $request->image->storeAs('images', $imageName);
-
-        // // Store in S3
-        // $request->image->storeAs('images', $imageName, 's3');
-
-        //Store IMage in DB
-
 
         return back()->with('success', 'Image uploaded Successfully!')
             ->with('image', $imageName);
     }
 
-
     /**
      * Display the specified resource.
+     *
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function show(Image $image)
     {
         $file = base64_decode($image->file);
         header('Content-type: image/jpeg', true, 200);
-        die($file);
+        exit($file);
     }
 }

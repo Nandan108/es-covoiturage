@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Image extends Model
+/**
+ * @property int    $id
+ * @property string $name
+ * @property string $file
+ */
+final class Image extends Model
 {
     protected $fillable = ['name', 'file'];
-
-    use HasFactory;
 }

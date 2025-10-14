@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Event;
 use App\Models\Image;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Collection;
 
-class MyEventController extends Controller
+/** @psalm-suppress UnusedClass */
+final class MyEventController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): View
     {
         $events = Event::withCount(['offers'])
             ->orderBy('start_date', 'desc')
@@ -26,22 +26,22 @@ class MyEventController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Event $myEvent)
+    public function edit(Event $myEvent): View
     {
         return view('my-events.edit', ['event' => $myEvent]);
     }
 
-    protected function validateData(Request $request, Event $myEvent = null) {
-
+    protected function validateData(Request $request, ?Event $myEvent = null): array
+    {
         $imgRequired = $myEvent ? '' : '|required';
 
         $data = $request->validate([
-            'image' => 'image|mimes:png,jpg,jpeg,webp|max:512000'.$imgRequired,
-            'name' => 'required|min:3|max:255',
-            'start_date' => 'date|required',
-            'days' => 'integer|required',
-            'private' => 'boolean|required',
-            'loc_name' => 'string',
+            'image'       => 'image|mimes:png,jpg,jpeg,webp|max:512000'.$imgRequired,
+            'name'        => 'required|min:3|max:255',
+            'start_date'  => 'date|required',
+            'days'        => 'integer|required',
+            'private'     => 'boolean|required',
+            'loc_name'    => 'string',
             'loc_address' => 'required|string|max:255',
             // latitude and longitude are valid from Canada to Italy
             'loc_lat' => 'required|numeric|between:36,66',
@@ -68,7 +68,7 @@ class MyEventController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Event $myEvent, Request $request)
+    public function update(Event $myEvent, Request $request): RedirectResponse
     {
         $data = $this->validateData($request, $myEvent);
 
@@ -77,19 +77,17 @@ class MyEventController extends Controller
         return redirect()->route('my-events.index')
             ->with(['success' => __('event updated')])
             ->with('event_id', $myEvent->id);
-
     }
 
-    public function create() {
+    public function create(): View
+    {
         return view('my-events.create');
     }
 
     /**
-     * Manage writing a new event do database
-     *
-     * @param Request $request
+     * Manage writing a new event do database.
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $data = $this->validateData($request);
         $data['loc_original_link'] = '';
@@ -102,7 +100,8 @@ class MyEventController extends Controller
             ->with('event_id', $event->id);
     }
 
-    public function destroy($eventId) {
+    public function destroy($eventId): RedirectResponse
+    {
         $event = Event::find(Event::keyFromHashId($eventId));
 
         try {

@@ -1,12 +1,11 @@
 <?php
 
+use App\Models\Event;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use App\Models\Event;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -18,8 +17,8 @@ return new class extends Migration
 
             $table->string('name', 50);
             $table->string('address', 255);
-            $table->decimal('lat',9,7)->comment('latitude');
-            $table->decimal('lng',10,7)->comment('longitude');
+            $table->decimal('lat', 9, 7)->comment('latitude');
+            $table->decimal('lng', 10, 7)->comment('longitude');
             $table->dateTime('depart')->nullable();
             $table->string('notes', 512)->nullable(); // précisions
             $table->string('phone', 50)->nullable();

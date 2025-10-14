@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Default Connection Name
@@ -27,19 +26,16 @@ return [
     */
 
     'connections' => [
-
         'main' => [
-            'salt' => 'o1SBvJRtPjdgcpxkdB83ZcFqmuxmfdA',
-            'length' => 10,
-            'alphabet' => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-.'
+            'salt'     => 'o1SBvJRtPjdgcpxkdB83ZcFqmuxmfdA',
+            'length'   => 10,
+            'alphabet' => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-.',
         ],
 
         'alternative' => [
-            'salt' => 'your-salt-string',
+            'salt'   => 'your-salt-string',
             'length' => 'your-length-integer',
             // 'alphabet' => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
         ],
-
     ],
-
 ];

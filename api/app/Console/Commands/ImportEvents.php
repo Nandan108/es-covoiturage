@@ -5,14 +5,15 @@ namespace App\Console\Commands;
 use App\Models\Event;
 use Illuminate\Console\Command;
 
-class ImportEvents extends Command
+/** @psalm-suppress UnusedClass */
+final class ImportEvents extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'app:import-events {id? : The ID or hashId of the event to import (optional)}';
+    protected $signature = 'app:import-events {ids?* : The IDs or hashIds of the event(s) to import (optional)}';
 
     /**
      * The console command description.
@@ -23,9 +24,25 @@ class ImportEvents extends Command
 
     /**
      * Execute the console command.
+     *
+     * @return void
      */
     public function handle()
     {
-        Event::importEventsFromMainSite($this->argument('id'));
+        $ids = $this->argument('ids');
+        if (!$ids) {
+            Event::importEventsFromMainSite();
+
+            return;
+        }
+        if (!is_array($ids)) {
+            $ids = [$ids];
+        }
+        foreach ($ids as $id) {
+            if (is_bool($id)) {
+                continue;
+            }
+            Event::importEventsFromMainSite($id);
+        }
     }
 }

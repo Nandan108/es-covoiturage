@@ -1,12 +1,11 @@
 <?php
 
-use App\Models\Image as Image;
+use App\Models\Image;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -24,8 +23,8 @@ return new class extends Migration
                 ->comment('ID of event on original site. Used to construct link to original event page');
             $table->string('loc_name', 64);
             $table->string('loc_address', 255);
-            $table->decimal('loc_lat',9,7)->comment('latitude');
-            $table->decimal('loc_lng',10,7)->comment('longitude');
+            $table->decimal('loc_lat', 9, 7)->comment('latitude');
+            $table->decimal('loc_lng', 10, 7)->comment('longitude');
             $table->string('loc_original_link');
             $table->timestamps();
         });

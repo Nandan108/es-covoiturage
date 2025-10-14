@@ -11,7 +11,8 @@
 >
     <projectFiles>
         <directory name="app"/>
-        <directory name="tests"/>
+        <directory name="routes"/>
+        <directory name="tests" errorLevel="6"/>
         <ignoreFiles>
             <directory name="vendor"/>
         </ignoreFiles>
