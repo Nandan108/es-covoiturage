@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useRef, useState, useEffect } from "react"
 import { usePartitionOffersByBounds } from "@/hooks/usePartitionOffersByBounds"
 import { OffersGrid } from "./map/OffersGrid"
 import type { EventDetail } from "@/types/types"
@@ -13,12 +13,25 @@ import Leaflet from "leaflet";
 //   return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}${label ? `&query_place_id=${encodeURIComponent(label)}` : ''}`
 // }
 
-function EventDetailBody({ event }: { event: EventDetail }) {
+function EventDetailBody({ event, offerId }: { event: EventDetail, offerId: number | null }) {
   const [bounds, setBounds] = useState<L.LatLngBounds | null>(null)
   const { inBounds, outOfBounds } = usePartitionOffersByBounds(event.offers, bounds) // , { padding: 0.05 }
   const initialPosition = event.loc_lat && event.loc_lng ? Leaflet.latLng(event.loc_lat, event.loc_lng) : null
   const mapRef = useRef<MapActions>(null)
-  const focus = (offerId: number) => mapRef.current?.focusOffer(offerId, { maxZoom: 15, openPopup: true })
+
+  // On page load and on change of offerId value,
+  // focus on the corresponding offer, if offerId is set
+  useEffect(() => {
+    const offer = offerId ? event.offers.find(o => o.id === offerId) : null;
+    if (!offer) return;
+    if (event.loc_lat && event.loc_lng && offer.lat && offer.lng) {
+      // wait a tick to make sure the map is rendered
+      requestAnimationFrame(() => {
+        mapRef.current?.focusOffer(offer.id, { openPopup: true })
+      })
+    }
+  }, [offerId, event])
+
 
   return (
     <div className="p-4 space-y-4">
@@ -53,8 +66,8 @@ function EventDetailBody({ event }: { event: EventDetail }) {
       </div>
 
       <div className="offers-container">
-        <OffersGrid title="Sur la carte" offers={inBounds} onFocusClick={focus} />
-        <OffersGrid title="Autres offres (hors cadre)" offers={outOfBounds} onFocusClick={focus} dim />
+        <OffersGrid title="Sur la carte" offers={inBounds} />
+        <OffersGrid title="Autres offres (hors cadre)" offers={outOfBounds} dim />
       </div>
     </div>
   )

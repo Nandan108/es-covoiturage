@@ -1,5 +1,5 @@
-import { Link } from "react-router";
-import type { Offer } from "@/types/types";
+import { Link, useRouteLoaderData } from "react-router";
+import type { EventDetail, Offer } from "@/types/types";
 
 // icons
 import { MdOutlineLocationSearching } from "react-icons/md";
@@ -7,7 +7,9 @@ import { ImBubble2 } from "react-icons/im";
 import { FaRegEdit } from "react-icons/fa";
 
 
-function OfferCard({ offer: o, onFocusClick }: { offer: Offer, onFocusClick: (id: number) => void  }) {
+function OfferCard({ offer: o }: { offer: Offer }) {
+  const event = useRouteLoaderData("event-detail") as EventDetail;
+
   return (
     <div className="relative rounded-lg bg-white p-2 shadow-lg" key={o.id}>
       <div className="flex flex-row border-b-1 border-gray-200 gap-3 py-1 pr-1">
@@ -27,11 +29,12 @@ function OfferCard({ offer: o, onFocusClick }: { offer: Offer, onFocusClick: (id
             </span>
           </div>
         )}
-        <MdOutlineLocationSearching
-          className="fa-solid fa-magnifying-glass cursor-pointer"
-          onClick={() => onFocusClick(o.id)}
-        />
-        <Link to={`offers/${o.id}/edit`} className="block cursor-pointer">
+        <Link to={`/events/${event.hashId}/offers/${o.id}`} className="block cursor-pointer">
+          <MdOutlineLocationSearching
+            className="fa-solid fa-magnifying-glass cursor-pointer"
+          />
+        </Link>
+        <Link to={`/events/${event.hashId}/offers/${o.id}/edit`} className="block cursor-pointer">
           <FaRegEdit />
         </Link>
       </div>

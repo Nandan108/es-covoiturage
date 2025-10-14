@@ -40,8 +40,12 @@ const router = createBrowserRouter([
         } as BreadcrumbHandle<EventDetail>,
         children: [
           {
-            // index: true,
             path: "",
+            lazy: async () => import("./pages/EventDetail"),
+          },
+          {
+            // Event detail with map focused on offer
+            path: "offers/:offerId",
             lazy: async () => import("./pages/EventDetail"),
           },
           {

@@ -5,12 +5,10 @@ export function OffersGrid({
   title,
   offers,
   dim,
-  onFocusClick,
 }: {
   title: string;
   offers: Offer[];
   dim?: boolean;
-  onFocusClick: (id: number) => void;
 }) {
   return (
     <>
@@ -21,7 +19,7 @@ export function OffersGrid({
         }`}
       >
         {offers.map((o) => (
-          <OfferCard key={o.id} offer={o} onFocusClick={onFocusClick} />
+          <OfferCard key={o.id} offer={o} />
         ))}
       </div>
     </>

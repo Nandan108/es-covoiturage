@@ -38,7 +38,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
     },
   }));
 
-  await runMutation(sub, "Unable to create offer", 500);
+  const { offer } = await runMutation(sub, "Unable to create offer", 500);
 
-  return redirect(`/events/${eventHash}`); // back to event detail
+  return redirect(`/events/${eventHash}/offers/${offer.id}`); // back to event detail
 }

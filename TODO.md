@@ -1,8 +1,6 @@
 # TODO
 10. Move event images to file storage for static serving
 04. Token-based security for editing offers
-13. Make /events/:eventhash>/offers/:id navigable
-    * if offer :id doesn't exist, fall back to /offers
 02. Add unit tests (both api and ui)
 06. Translations (EN, FR)
 07. Add Admin pages
@@ -20,3 +18,5 @@
 08. Show event name/image in offer form
 09. Show event name in page meta title
 03. Trash button on offer form in edit mode
+13. Make /events/:eventhash/offers/:id navigable (open corresponding marker's popup on map)
+    * if offer :id doesn't exist, fall back to /offers

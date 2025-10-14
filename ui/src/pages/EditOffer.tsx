@@ -37,7 +37,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
     await updateOffer(eventHash, offerId, formData);
   }
 
-  return redirect(`/events/${eventHash}`); // back to event detail
+  return redirect(`/events/${eventHash}/offers/${offerId}`); // back to event detail
 }
 
 async function deleteOffer(eventHash: string, offerId: number) {
