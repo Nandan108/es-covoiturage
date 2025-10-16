@@ -1,6 +1,6 @@
 // ui/src/store/api.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { EventSummary, EventDetail, Offer, HashId } from "@/types/types";
+import type { EventSummary, EventDetail, Offer, HashId, Meta } from "@/types/types";
 
 export type Api = typeof api;
 
@@ -9,11 +9,13 @@ export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
   endpoints: (b) => ({
     getEvents: b.query<EventSummary[], void>({
-      query: () => "events",
+      query: () => "/events",
+      transformResponse: (res: { data: EventSummary[]; meta?: Meta }) => res.data,
     }),
 
     getEvent: b.query<EventDetail, HashId>({
       query: (id) => `events/${id}`,
+      transformResponse: (res: { data: EventDetail }) => res.data,
     }),
 
     createOffer: b.mutation<
@@ -86,7 +88,7 @@ export const api = createApi({
         url: `events/${eventHash}/offers/${offerId}`,
         method: "PATCH",
         body: patch,
-        headers: { "X-Offer-Token": "some-token", "Accept": "application/json" }, // TODO: pass real token
+        headers: { "X-Offer-Token": "some-token", Accept: "application/json" }, // TODO: pass real token
       }),
       async onQueryStarted({ offerId, eventHash, patch }, { dispatch, queryFulfilled }) {
         const prev = dispatch(
@@ -103,34 +105,32 @@ export const api = createApi({
       },
     }),
 
-    deleteOffer: b.mutation<{ success: boolean }, { id: number; eventHash: HashId }>(
-      {
-        query: ({ id, eventHash }) => ({
-          url: `events/${eventHash}/offers/${id}`,
-          method: "DELETE",
-          headers: { "X-Offer-Token": "some-token" }, // TODO: pass real token
-        }),
-        async onQueryStarted({ id, eventHash }, { dispatch, queryFulfilled }) {
-          const patchEvent = dispatch(
-            api.util.updateQueryData("getEvent", eventHash, (draft) => {
-              draft.offers = draft.offers.filter((o) => o.id !== id);
-            })
-          );
-          const patchList = dispatch(
-            api.util.updateQueryData("getEvents", undefined, (draft) => {
-              const e = draft.find((e) => e.hashId === eventHash);
-              if (e && typeof e.offers_count === "number") e.offers_count -= 1;
-            })
-          );
-          try {
-            await queryFulfilled;
-          } catch {
-            patchEvent.undo();
-            patchList.undo();
-          }
-        },
-      }
-    ),
+    deleteOffer: b.mutation<{ success: boolean }, { id: number; eventHash: HashId }>({
+      query: ({ id, eventHash }) => ({
+        url: `events/${eventHash}/offers/${id}`,
+        method: "DELETE",
+        headers: { "X-Offer-Token": "some-token" }, // TODO: pass real token
+      }),
+      async onQueryStarted({ id, eventHash }, { dispatch, queryFulfilled }) {
+        const patchEvent = dispatch(
+          api.util.updateQueryData("getEvent", eventHash, (draft) => {
+            draft.offers = draft.offers.filter((o) => o.id !== id);
+          })
+        );
+        const patchList = dispatch(
+          api.util.updateQueryData("getEvents", undefined, (draft) => {
+            const e = draft.find((e) => e.hashId === eventHash);
+            if (e && typeof e.offers_count === "number") e.offers_count -= 1;
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchEvent.undo();
+          patchList.undo();
+        }
+      },
+    }),
   }),
 });
 

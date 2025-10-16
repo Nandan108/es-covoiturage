@@ -25,5 +25,6 @@ export async function loader({ params }: LoaderFunctionArgs) {
   const hashId = params.id as HashId;
   const sub = store.dispatch(api.endpoints.getEvent.initiate(hashId));
 
-  return runQuery(sub, "Désolé, cet événement est introuvable", 404);
+  const result = runQuery(sub, "Désolé, cet événement est introuvable", 404);
+  return result;
 }

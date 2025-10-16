@@ -7,6 +7,7 @@
     * index (liste of events)
     * event page create mode
     * event page edit mode
+14. Add notification snack bar
 
 # DONE!
 01. Set up CI/CD
@@ -20,3 +21,4 @@
 03. Trash button on offer form in edit mode
 13. Make /events/:eventhash/offers/:id navigable (open corresponding marker's popup on map)
     * if offer :id doesn't exist, fall back to /offers
+15. Add api feature test suite

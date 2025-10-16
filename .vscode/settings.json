@@ -2,12 +2,9 @@
   // disable VS Code's built-in PHP validation
   "php.validate.enable": false,
 
-  // disable Intelephense diagnostics if installed
-  "intelephense.diagnostics.enable": false,
-
-  // point Psalm extension to your binary and config
-  "psalm.useGlobal": false,
+  // Adjust psalm extension config path
   "psalm.psalmScriptPath": "api/vendor/bin/psalm",
-  "psalm.configPath": "api/psalm.xml",
-  "psalm.showInfoMessages": true
+
+  // Adjust PHPUnit extension config path
+  "phpunit.phpunit": "api/vendor/bin/phpunit",
 }

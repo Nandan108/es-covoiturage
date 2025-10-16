@@ -11,12 +11,19 @@
 >
     <projectFiles>
         <directory name="app"/>
-        <directory name="routes"/>
         <directory name="tests" errorLevel="6"/>
         <ignoreFiles>
             <directory name="vendor"/>
         </ignoreFiles>
     </projectFiles>
+
+    <issueHandlers>
+        <PropertyNotSetInConstructor>
+            <errorLevel type="suppress">
+                <directory name="tests" />
+            </errorLevel>
+        </PropertyNotSetInConstructor>
+    </issueHandlers>
 
     <issueHandlers>
         <UnusedClass>

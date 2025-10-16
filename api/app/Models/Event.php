@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\EventFactory;
 use Deligoez\LaravelModelHashId\Traits\HasHashId;
 use Deligoez\LaravelModelHashId\Traits\HasHashIdRouting;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -31,6 +33,8 @@ final class Event extends Model
 {
     use HasHashId;
     use HasHashIdRouting;
+    /** @use HasFactory<EventFactory> */
+    use HasFactory;
 
     protected $fillable = [
         'name',

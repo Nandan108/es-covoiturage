@@ -22,7 +22,7 @@ final class EventController extends Controller
             ->get()
             ->each->append('hashId')->makeHidden('id');
 
-        return response()->json($events);
+        return response()->json(['data' => $events]);
     }
 
     /**
@@ -35,6 +35,6 @@ final class EventController extends Controller
         $event->load(['offers' => fn (Builder $q): mixed => $q->latest()]);
 
         // return view('events.show', ['event' => $event]);
-        return response()->json($event);
+        return response()->json(['data' => $event]);
     }
 }
