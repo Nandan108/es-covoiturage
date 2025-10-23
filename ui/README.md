@@ -7,6 +7,14 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
+## Testing
+
+- `npm run test` – run the Vitest suite once in a jsdom environment
+- `npm run test:watch` – keep tests running while you edit files
+- `npm run test:coverage` – collect coverage with Vitest’s built-in reporter
+
+Tests live alongside the source (for example `src/components/__tests__`) and share the setup in `src/test/setup.ts`, which brings in React Testing Library helpers and cleans up between cases.
+
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:

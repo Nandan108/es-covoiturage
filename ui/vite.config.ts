@@ -1,4 +1,5 @@
-import { defineConfig, type PluginOption } from "vite";
+import { type PluginOption } from "vite";
+import { defineConfig } from 'vitest/config'
 import react from "@vitejs/plugin-react-swc";
 import tailwind from "@tailwindcss/vite";
 import { visualizer } from "rollup-plugin-visualizer";
@@ -26,5 +27,12 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ["leaflet"], // pre-bundle it once
+  },
+  test: {
+    environment: "jsdom",
+    globals: true,
+    setupFiles: "./src/test/setup.ts",
+    css: true,
+    pool: "vmThreads",
   },
 });

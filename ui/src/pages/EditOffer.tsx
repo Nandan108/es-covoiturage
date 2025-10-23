@@ -43,7 +43,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
 async function deleteOffer(eventHash: string, offerId: number) {
   const sub = store.dispatch(api.endpoints.deleteOffer.initiate({ id: offerId, eventHash }));
 
-  return runMutation(sub, "Unable to delete offer", 500);
+  return await runMutation(sub, "Unable to delete offer", 500);
 }
 
 async function updateOffer(eventHash: string, offerId: number, formData: FormData) {
