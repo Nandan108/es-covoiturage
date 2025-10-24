@@ -22,5 +22,4 @@
     * if offer :id doesn't exist, fall back to /offers
 15. Add api feature test suite
 10. Move event images to file storage for static serving
-
-I've adjusted the code related to image_url, as each event is garanteed to have an image_id
+16. Add ui- and api- test jobs + psalm check to CI pipeline
