@@ -1,6 +1,6 @@
 # TODO
-04. Token-based security for editing offers
 02. Add unit tests (both api and ui)
+04. Token-based security for editing offers
 06. Translations (EN, FR)
 07. Add Admin pages
     * index (liste of events)

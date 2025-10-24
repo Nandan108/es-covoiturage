@@ -3,6 +3,7 @@
 namespace App\Http\Responses;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 
 /**
  * @psalm-suppress UnusedClass // used in bootstrap/app.php
@@ -33,7 +34,22 @@ final class ProblemDetails
 
     public static function fromException(\Throwable $e, ?string $instance = null): JsonResponse
     {
-        $status = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
+        if ($e instanceof ValidationException) {
+            return self::from(
+                type: 'about:blank',
+                title: self::getTitleForStatus($e->status),
+                status: $e->status,
+                detail: $e->getMessage(),
+                instance: $instance,
+                extra: [
+                    'errors' => $e->errors(),
+                ],
+            );
+        }
+
+        $status = method_exists($e, 'getStatusCode')
+            ? $e->getStatusCode()
+            : 500;
 
         return self::from(
             type: 'about:blank',
