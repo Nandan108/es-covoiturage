@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Image;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,7 +21,7 @@ class EventFactory extends Factory
             'name'              => $this->faker->sentence(),
             'type'              => $this->faker->randomElement(['retreat', 'silent-retreat', 'seminar']),
             'days'              => $this->faker->numberBetween(2, 3),
-            'image_id'          => $this->faker->numberBetween(1, 10),
+            'image_id'          => Image::factory(),
             'loc_name'          => $this->faker->word(),
             'loc_address'       => $this->faker->address(),
             'loc_lat'           => $this->faker->latitude(49.1545224, 43.860136),

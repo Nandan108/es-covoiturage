@@ -20,7 +20,6 @@ function formatedDateRange(e: EventSummary) {
 }
 
 function EventCard({ className, e }: { className?: string; e: EventSummary }) {
-  //  {{$orientClass}}
   return (
       <article
         style={{ fontSize: "16px" }}
@@ -32,7 +31,7 @@ function EventCard({ className, e }: { className?: string; e: EventSummary }) {
       >
         <Link to={`/events/${e.hashId}`} className="flex flex-col @sm:flex-row">
           <img
-            src={getImageUrl(e.image_id)}
+            src={getImageUrl(e.image_url)}
             alt={e.name}
             className="w-full object-cover @sm:max-w-52"
             loading="lazy"

@@ -20,7 +20,7 @@ final class EventController extends Controller
             ->upcoming() // this scope filters out expired events
             ->orderBy('start_date')
             ->get()
-            ->each->append('hashId')->makeHidden('id');
+            ->each->append(['hashId', 'image_url'])->makeHidden('id');
 
         return response()->json(['data' => $events]);
     }

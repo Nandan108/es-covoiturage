@@ -142,13 +142,13 @@ export const {
   useDeleteOfferMutation,
 } = api;
 
+const devRoot = "http://127.0.0.1:8000";
+const origin = import.meta.env.DEV ? devRoot : "";
+
 export function getApiUrl(path: string) {
-  const base = import.meta.env.DEV
-    ? "http://127.0.0.1:8000/api" // DEV: Laravel dev server
-    : "/api"; // PROD: /api → same origin
-  return `${base}/${path.replace(/^\/+/, "")}`;
+  return `${origin}/api/${path.replace(/^\/+/, "")}`;
 }
 
-export function getImageUrl(id: string | number) {
-  return getApiUrl(`images/${id}`);
+export function getImageUrl(image_url: string) {
+  return origin + image_url;
 }

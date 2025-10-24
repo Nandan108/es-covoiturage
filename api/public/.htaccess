@@ -5,6 +5,12 @@
 
     RewriteEngine On
 
+    # Route missing /images/* files back through Laravel so they can be streamed from storage.
+    RewriteCond %{REQUEST_URI} ^/images/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

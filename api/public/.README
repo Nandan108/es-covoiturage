@@ -1,0 +1,6 @@
+This directory is the default Laravel \"public\" folder, but the project is served
+from the repository root `public/` directory instead.
+
+Static event images are exposed via `public/images/events` (symlinked to
+`api/storage/images`). The legacy `api/public/images` symlink is removed during
+application boot to avoid confusion.

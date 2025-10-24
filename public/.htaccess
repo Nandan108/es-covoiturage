@@ -4,9 +4,15 @@ RewriteEngine On
 RewriteCond %{REQUEST_URI} ^/api
 RewriteRule ^api(/.*)?$ api-index.php [L]
 
-# 2. Serve static files from /ui directly (images, js, css, etc.) if they exist
+# 2. If /images/events file is missing, fall back to Laravel for DB-backed response
+RewriteCond %{REQUEST_URI} ^/images/events/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ api-index.php [L]
+
+# 3. Serve static files from /ui directly (images, js, css, etc.) if they exist
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule . - [L]
 
-# 3. Otherwise, fallback to React app
+# 4. Otherwise, fallback to React app
 RewriteRule ^ index.html [L]

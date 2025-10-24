@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\EventController;
-use App\Http\Controllers\ImageController;
 use App\Http\Controllers\MyEventController;
 use App\Http\Controllers\OfferController;
 use Illuminate\Support\Facades\Route;
@@ -18,7 +17,3 @@ Route::resource('events.offers', OfferController::class)
 //     Route::resource('my-events', MyEventController::class);
 //     Route::delete('auth', [AuthController::class, 'destroy'])->name('logout');
 // });
-
-// Images, served from DB storage for now
-Route::resource('images', ImageController::class)
-    ->only(['show']);

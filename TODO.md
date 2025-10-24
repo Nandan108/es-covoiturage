@@ -1,5 +1,4 @@
 # TODO
-10. Move event images to file storage for static serving
 04. Token-based security for editing offers
 02. Add unit tests (both api and ui)
 06. Translations (EN, FR)
@@ -22,3 +21,6 @@
 13. Make /events/:eventhash/offers/:id navigable (open corresponding marker's popup on map)
     * if offer :id doesn't exist, fall back to /offers
 15. Add api feature test suite
+10. Move event images to file storage for static serving
+
+I've adjusted the code related to image_url, as each event is garanteed to have an image_id

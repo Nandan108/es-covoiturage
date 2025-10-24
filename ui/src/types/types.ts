@@ -1,8 +1,8 @@
 // ui/src/types.ts
-export type EventType = 'retreat' | 'seminar' | 'silent-retreat';
+export type EventType = "retreat" | "seminar" | "silent-retreat";
 
-export type ISODate = string;        // 'YYYY-MM-DD'
-export type ISODateTime = string;    // 'YYYY-MM-DDTHH:mm:ssZ' (or similar)
+export type ISODate = string; // 'YYYY-MM-DD'
+export type ISODateTime = string; // 'YYYY-MM-DDTHH:mm:ssZ' (or similar)
 
 export type HashId = string; // e.g. "event_kqYZeLgo"
 
@@ -36,9 +36,8 @@ export interface EventSummary {
   loc_lat: number;
   loc_lng: number;
   loc_original_link: string;
-  image_id: string;        // get image from /images/{id}
-  // image_url?: string;       // if you choose to expose it
-  offers_count?: number;    // optional optimization for the list
+  image_url: string; // static asset path
+  offers_count?: number; // optional optimization for the list
   created_at: ISODateTime;
   updated_at: ISODateTime;
 }
@@ -55,4 +54,3 @@ export type Meta = {
 export interface EventDetail extends EventSummary {
   offers: Offer[];
 }
-

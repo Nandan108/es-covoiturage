@@ -28,6 +28,8 @@ use PHPHtmlParser\Dom;
  * @property string $start_date
  * @property string $loc_original_link
  * @property bool   $private
+ * @property Image  $picture
+ * @property string $image_url
  */
 final class Event extends Model
 {
@@ -53,6 +55,15 @@ final class Event extends Model
 
     protected $appends = [
         'hashId',
+        'image_url',
+    ];
+
+    protected $with = [
+        'picture',
+    ];
+
+    protected $hidden = [
+        'picture',
     ];
 
     #[\Override]
@@ -70,9 +81,15 @@ final class Event extends Model
     }
 
     /** @psalm-suppress PossiblyUnusedMethod */
+    public function getImageUrlAttribute(): string
+    {
+        return $this->picture->publicPath();
+    }
+
+    /** @psalm-suppress PossiblyUnusedMethod */
     public function picture(): BelongsTo
     {
-        return $this->belongsTo(Image::class);
+        return $this->belongsTo(Image::class, 'image_id');
     }
 
     public function offers(): HasMany
@@ -213,6 +230,7 @@ final class Event extends Model
             try {
                 $img = Image::where('name', '=', basename($eventData['pic_url']))
                     ->firstOr($importImage);
+                $img->ensureStoredLocally();
             } catch (\RuntimeException $e) {
                 echo $e->getMessage()."\n";
                 continue;

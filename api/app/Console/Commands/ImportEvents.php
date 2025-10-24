@@ -30,6 +30,7 @@ final class ImportEvents extends Command
     public function handle()
     {
         $ids = $this->argument('ids');
+        /** @psalm-suppress RiskyTruthyFalsyComparison */
         if (!$ids) {
             Event::importEventsFromMainSite();
 

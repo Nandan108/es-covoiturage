@@ -7,6 +7,7 @@ use App\Models\Image;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 
 /** @psalm-suppress UnusedClass */
 final class MyEventController extends Controller
@@ -16,6 +17,7 @@ final class MyEventController extends Controller
      */
     public function index(): View
     {
+        /** @psalm-suppress UndefinedMagicMethod */
         $events = Event::withCount(['offers'])
             ->orderBy('start_date', 'desc')
             ->get();
@@ -48,16 +50,20 @@ final class MyEventController extends Controller
             'loc_lng' => 'required|numeric|between:-175,18',
         ]);
 
-        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+        $imgFile = $request->file('image');
+        if ($imgFile instanceof UploadedFile && $imgFile->isValid()) {
             $imageFile = $data['image'];
             $b64Image = base64_encode($imageFile->get());
-            if (!($image = Image::whereRaw('crc32(file) = ?', crc32($b64Image))->first())) {
-                // $request->image->move(public_path('images'), $imageName);
+            // Check if the image already exists in the database
+            /** @psalm-suppress UndefinedMagicMethod */
+            $image = Image::whereRaw('crc32(file) = ?', crc32($b64Image))->first();
+            if (!$image) {
                 $image = new Image([
-                    'name' => $request->file('image')->getClientOriginalName(),
+                    'name' => $imgFile->getClientOriginalName(),
                     'file' => $b64Image,
                 ]);
                 $image->save();
+                $image->ensureStoredLocally();
             }
             $data['image_id'] = $image->id;
         }
@@ -100,7 +106,7 @@ final class MyEventController extends Controller
             ->with('event_id', $event->id);
     }
 
-    public function destroy($eventId): RedirectResponse
+    public function destroy(string $eventId): RedirectResponse
     {
         $event = Event::find(Event::keyFromHashId($eventId));
 

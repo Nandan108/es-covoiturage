@@ -3,10 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\Event;
+use App\Models\Image;
 use App\Models\Offer;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
 use Tests\TestCase;
 
 abstract class ApiTestCase extends TestCase
@@ -36,6 +38,14 @@ abstract class ApiTestCase extends TestCase
         parent::setUp();
     }
 
+    #[\Override]
+    protected function tearDown(): void
+    {
+        $this->cleanupTestImages();
+
+        parent::tearDown();
+    }
+
     protected function setUpFakeEvents(int $count = 10): void
     {
         /** @var Collection<int, Event> */
@@ -57,5 +67,20 @@ abstract class ApiTestCase extends TestCase
         $event = fake()->randomElement($this->events->values()->all());
 
         return $event;
+    }
+
+    private function cleanupTestImages(): void
+    {
+        $dir = storage_path(Image::STORAGE_DIR);
+        if (!File::isDirectory($dir)) {
+            return;
+        }
+
+        foreach (File::files($dir) as $file) {
+            $basename = $file->getFilename();
+            if (str_starts_with($basename, 'test-image-')) {
+                File::delete($file->getRealPath());
+            }
+        }
     }
 }
