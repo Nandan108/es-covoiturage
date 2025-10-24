@@ -47,6 +47,7 @@ describe("EventCard", () => {
       "src",
       mockEvent.image_url
     );
+    expect(screen.getByText(/15 au 17/)).toBeInTheDocument();
     expect(screen.getByTestId("router-link")).toHaveAttribute(
       "href",
       `/events/${mockEvent.hashId}`

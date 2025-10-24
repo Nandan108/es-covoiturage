@@ -1,5 +1,4 @@
 # TODO
-02. Add unit tests (both api and ui)
 04. Token-based security for editing offers
 06. Translations (EN, FR)
 07. Add Admin pages
@@ -23,3 +22,4 @@
 15. Add api feature test suite
 10. Move event images to file storage for static serving
 16. Add ui- and api- test jobs + psalm check to CI pipeline
+02. Add unit tests (both api and ui)
