@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use PHPHtmlParser\Dom;
@@ -25,7 +26,7 @@ use PHPHtmlParser\Dom;
  * @property float  $loc_lat
  * @property float  $loc_lng
  * @property int    $original_event_id
- * @property string $start_date
+ * @property Carbon $start_date
  * @property string $loc_original_link
  * @property bool   $private
  * @property Image  $picture
@@ -95,6 +96,13 @@ final class Event extends Model
     public function offers(): HasMany
     {
         return $this->hasMany(Offer::class);
+    }
+
+    public function endDate(): Carbon
+    {
+        $days = max(1, $this->days);
+
+        return $this->start_date->copy()->addDays($days - 1)->endOfDay();
     }
 
     /**

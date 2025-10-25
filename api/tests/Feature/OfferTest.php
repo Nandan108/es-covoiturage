@@ -2,7 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Mail\OfferAccessMail;
 use App\Models\Offer;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 final class OfferTest extends ApiTestCase
 {
@@ -10,6 +13,7 @@ final class OfferTest extends ApiTestCase
     public function setUp(): void
     {
         parent::setUp();
+        Mail::fake();
         $this->setUpFakeEvents(3);
     }
 
@@ -52,12 +56,17 @@ final class OfferTest extends ApiTestCase
         $response->assertJsonPath('offer.address', $offerData['address']);
         $response->assertJsonPath('offer.lat', $offerData['lat']);
         $response->assertJsonPath('offer.lng', $offerData['lng']);
+        $response->assertJsonPath('edit_token', fn (?string $token) => is_string($token) && strlen($token) > 10);
+        $response->assertJsonPath('expires_at', fn (?string $expires) => is_string($expires));
+
+        Mail::assertSent(OfferAccessMail::class);
     }
 
     public function testCanPatchOffer(): void
     {
         $event = $this->randomEvent();
         $offer = $event->offers()->inRandomOrder()->firstOrFail();
+        $token = $offer->issueOwnerToken(Carbon::now()->addDay());
 
         // make patch data randomly
         $offerData = [
@@ -68,7 +77,7 @@ final class OfferTest extends ApiTestCase
         ];
 
         $uri = route('events.offers.update', ['event' => $event->hashId, 'offer' => $offer->id]);
-        $response = $this->patchJson($uri, $offerData);
+        $response = $this->patchJson($uri, $offerData, ['X-Offer-Token' => $token]);
         $response->assertOk();
         // assert the response contains the offer data plus an ID and eventHash
         $response->assertJsonStructure([
@@ -91,13 +100,34 @@ final class OfferTest extends ApiTestCase
     {
         $event = $this->randomEvent();
         $offer = $event->offers()->inRandomOrder()->firstOrFail();
+        $token = $offer->issueOwnerToken(Carbon::now()->addDay());
 
         $uri = route('events.offers.destroy', ['event' => $event->hashId, 'offer' => $offer->id]);
-        $response = $this->deleteJson($uri);
+        $response = $this->deleteJson($uri, [], ['X-Offer-Token' => $token]);
         $response->assertStatus(200);
 
         // assert the offer was deleted
         $response->assertJsonPath('message', 'Offer deleted successfully');
         $this->assertDatabaseMissing('offers', ['id' => $offer->id]);
+    }
+
+    public function testUpdateRequiresToken(): void
+    {
+        $event = $this->randomEvent();
+        $offer = $event->offers()->inRandomOrder()->firstOrFail();
+
+        $uri = route('events.offers.update', ['event' => $event->hashId, 'offer' => $offer->id]);
+        $this->patchJson($uri, ['name' => 'No token'])
+            ->assertForbidden();
+    }
+
+    public function testDeleteRequiresToken(): void
+    {
+        $event = $this->randomEvent();
+        $offer = $event->offers()->inRandomOrder()->firstOrFail();
+
+        $uri = route('events.offers.destroy', ['event' => $event->hashId, 'offer' => $offer->id]);
+        $this->deleteJson($uri)
+            ->assertForbidden();
     }
 }

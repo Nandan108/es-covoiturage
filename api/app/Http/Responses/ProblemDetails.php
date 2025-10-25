@@ -32,6 +32,7 @@ final class ProblemDetails
         ]);
     }
 
+    /** @psalm-suppress PossiblyUnusedMethod*/
     public static function fromException(\Throwable $e, ?string $instance = null): JsonResponse
     {
         if ($e instanceof ValidationException) {

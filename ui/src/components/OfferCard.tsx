@@ -1,5 +1,6 @@
 import { Link, useRouteLoaderData } from "react-router";
 import type { EventDetail, Offer } from "@/types/types";
+import { getOfferToken } from "@/utils/offerTokens";
 
 // icons
 import { MdOutlineLocationSearching } from "react-icons/md";
@@ -9,6 +10,7 @@ import { FaRegEdit } from "react-icons/fa";
 
 function OfferCard({ offer: o }: { offer: Offer }) {
   const event = useRouteLoaderData("event-detail") as EventDetail;
+  const hasEditToken = Boolean(getOfferToken(o.id));
 
   return (
     <div className="relative rounded-lg bg-white p-2 shadow-lg" key={o.id}>
@@ -34,9 +36,11 @@ function OfferCard({ offer: o }: { offer: Offer }) {
             className="fa-solid fa-magnifying-glass cursor-pointer"
           />
         </Link>
-        <Link to={`/events/${event.hashId}/offers/${o.id}/edit`} className="block cursor-pointer">
-          <FaRegEdit />
-        </Link>
+        {hasEditToken ? (
+          <Link to={`/events/${event.hashId}/offers/${o.id}/edit`} className="block cursor-pointer">
+            <FaRegEdit />
+          </Link>
+        ) : null}
       </div>
       <div className="text-xs text-slate-600 leading-5 relative">
         {o.pasngr_seats ? (

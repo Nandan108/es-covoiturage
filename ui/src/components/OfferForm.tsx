@@ -81,7 +81,7 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
             <div className="block text-sm mb-1">
               Votre lieu de départ <i className="text-gray-500 text-xs">(affiché sur l'offre)</i>
             </div>
-            <input ref={addressRef} className="input" name="address" defaultValue={form.address} />
+            <input ref={addressRef} className="input" name="address" defaultValue={form.address} required/>
           </label>
         </div>
 

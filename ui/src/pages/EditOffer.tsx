@@ -6,6 +6,7 @@ import { redirect, type ActionFunctionArgs } from "react-router";
 import type { HashId } from "@/types/types";
 import { store } from "@/store/store";
 import { api } from "@/store/api";
+import { useOfferTokenCapture } from "@/hooks/useOfferTokenCapture";
 
 export function Component() {
   // get event from parent route loader data
@@ -14,6 +15,8 @@ export function Component() {
   const { offerId: offerIdString } = useParams();
   const offerId = Number(offerIdString);
   const offer = event?.offers.find((o: Offer) => o.id === offerId);
+
+  useOfferTokenCapture(event, Number.isFinite(offerId) ? offerId : null);
 
   return <OfferForm offer={offer} event={event} />;
 }

@@ -1,6 +1,7 @@
 // ui/src/store/api.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { EventSummary, EventDetail, Offer, HashId, Meta } from "@/types/types";
+import { getOfferToken, rememberOfferToken } from "@/utils/offerTokens";
 
 export type Api = typeof api;
 
@@ -11,6 +12,7 @@ export const api = createApi({
     getEvents: b.query<EventSummary[], void>({
       query: () => "/events",
       transformResponse: (res: { data: EventSummary[]; meta?: Meta }) => res.data,
+      keepUnusedDataFor: 60 * 60 * 24, // 24 hours in seconds
     }),
 
     getEvent: b.query<EventDetail, HashId>({
@@ -19,11 +21,9 @@ export const api = createApi({
     }),
 
     createOffer: b.mutation<
-      // ResultType
-      { offer: Offer; edit_token?: string },
-      // QueryArg
+      { offer: Offer; edit_token: string, expires_at: string },
       {
-        eventHash: HashId; // cache key for getEvent()
+        eventHash: HashId;
         payload: Omit<Offer, "id" | "eventHash" | "created_at" | "updated_at">;
       }
     >({
@@ -60,14 +60,16 @@ export const api = createApi({
         );
 
         try {
-          const { data } = await queryFulfilled;
-          // 2) Replace temp offer with server offer
+          const { data: { offer, edit_token, expires_at } } = await queryFulfilled;
+          // 2.a) Replace temp offer with server offer
           dispatch(
             api.util.updateQueryData("getEvent", eventHash, (draft) => {
               const i = draft.offers.findIndex((o) => o.id === tempId);
-              if (i !== -1) draft.offers[i] = data.offer;
+              if (i !== -1) draft.offers[i] = offer;
             })
           );
+          // 2.b) Store the edit token
+          rememberOfferToken(offer.id, edit_token, expires_at);
         } catch {
           // 3) Roll back if the request failed
           patchEvent.undo();
@@ -84,12 +86,18 @@ export const api = createApi({
         patch: Partial<Omit<Offer, "id" | "event_id" | "created_at">>;
       }
     >({
-      query: ({ offerId, eventHash, patch }) => ({
-        url: `events/${eventHash}/offers/${offerId}`,
-        method: "PATCH",
-        body: patch,
-        headers: { "X-Offer-Token": "some-token", Accept: "application/json" }, // TODO: pass real token
-      }),
+      query: ({ offerId, eventHash, patch }) => {
+        const headers: Record<string, string> = { Accept: "application/json" };
+        const token = getOfferToken(offerId);
+        if (token) headers["X-Offer-Token"] = token;
+
+        return {
+          url: `events/${eventHash}/offers/${offerId}`,
+          method: "PATCH",
+          body: patch,
+          headers,
+        };
+      },
       async onQueryStarted({ offerId, eventHash, patch }, { dispatch, queryFulfilled }) {
         const prev = dispatch(
           api.util.updateQueryData("getEvent", eventHash, (draft) => {
@@ -106,11 +114,17 @@ export const api = createApi({
     }),
 
     deleteOffer: b.mutation<{ success: boolean }, { id: number; eventHash: HashId }>({
-      query: ({ id, eventHash }) => ({
-        url: `events/${eventHash}/offers/${id}`,
-        method: "DELETE",
-        headers: { "X-Offer-Token": "some-token" }, // TODO: pass real token
-      }),
+      query: ({ id, eventHash }) => {
+        const headers: Record<string, string> = {};
+        const token = getOfferToken(id);
+        if (token) headers["X-Offer-Token"] = token;
+
+        return {
+          url: `events/${eventHash}/offers/${id}`,
+          method: "DELETE",
+          headers,
+        };
+      },
       async onQueryStarted({ id, eventHash }, { dispatch, queryFulfilled }) {
         const patchEvent = dispatch(
           api.util.updateQueryData("getEvent", eventHash, (draft) => {

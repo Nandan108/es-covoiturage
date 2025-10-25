@@ -20,6 +20,8 @@ export interface Offer {
   email_is_public: boolean;
   driver_seats: number;
   pasngr_seats: number;
+  token_hash: string | null;
+  token_expires_at: ISODateTime | null;
   created_at: ISODateTime;
   updated_at: ISODateTime;
 }

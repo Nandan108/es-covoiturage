@@ -5,6 +5,7 @@ import { store } from "@/store/store";
 import { api } from "@/store/api";
 import { runQuery } from '@/utils';
 import EventDetailBody from "@/components/EventDetailBody";
+import { useOfferTokenCapture } from "@/hooks/useOfferTokenCapture";
 
 /* eslint-disable react-refresh/only-export-components */
 
@@ -12,6 +13,8 @@ export function Component() {
   const event = useLoaderData() as EventDetail;
   const { offerId } = useParams();
   const offer = offerId ? event.offers.find(o => o.id === Number(offerId)) : null;
+
+  useOfferTokenCapture(event, offerId ? Number(offerId) : null);
 
   // if offerId is set but not found, we redirect back to event detail without offerId
   if (offerId && !offer) {

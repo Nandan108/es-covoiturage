@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Responses\ProblemDetails;
+use App\Mail\OfferAccessMail;
 use App\Models\Event;
 use App\Models\Offer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 /** @psalm-suppress UnusedClass */
 final class OfferController extends Controller
@@ -44,14 +47,31 @@ final class OfferController extends Controller
     {
         $data = $this->validateForm($request);
 
-        $offer = $event->offers()->create($data)->toArray();
+        /** @var Offer $offer */
+        $offer = $event->offers()->create($data);
+        $expiresAt = $event->endDate();
+        $token = $offer->issueOwnerToken($expiresAt);
 
-        unset($offer['event_id']);
-        $offer['eventHash'] = $event->hashId;
+        $payload = $offer->toArray();
+        unset($payload['event_id']);
+        $payload['eventHash'] = $event->hashId;
+
+        $frontendUrl = rtrim((string) config('app.frontend_url', config('app.url')), '/');
+        Mail::to($offer->email)->send(
+            new OfferAccessMail(
+                $event,
+                $offer,
+                $token,
+                $frontendUrl,
+                $expiresAt->toIso8601String()
+            )
+        );
 
         return response()->json([
-            'message' => 'Offer created successfully',
-            'offer'   => $offer,
+            'message'    => 'Offer created successfully',
+            'offer'      => $payload,
+            'edit_token' => $token,
+            'expires_at' => $expiresAt->toIso8601String(),
         ], 201);
     }
 
@@ -80,6 +100,10 @@ final class OfferController extends Controller
             ], 400);
         }
 
+        if ($response = $this->validateOfferToken($request, $offer)) {
+            return $response;
+        }
+
         $data = $this->validateForm($request, patch: true);
         $offer->update($data);
 
@@ -96,14 +120,34 @@ final class OfferController extends Controller
      *
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function destroy(Event $event, Offer $offer): JsonResponse
+    public function destroy(Event $event, Offer $offer, Request $request): JsonResponse
     {
         if ($event->id !== $offer->event_id) {
             return response()->json(['message' => 'Offer does not belong to the specified event'], 400);
         }
 
+        if ($response = $this->validateOfferToken($request, $offer)) {
+            return $response;
+        }
+
         $result = $offer->delete() ? ['deleted successfully', 200] : ['not deleted', 500];
 
         return response()->json(['message' => 'Offer '.$result[0]], $result[1]);
+    }
+
+    private function validateOfferToken(Request $request, Offer $offer): ?JsonResponse
+    {
+        $token = $request->header('X-Offer-Token') ?? $request->input('token');
+        if ($offer->tokenIsValid($token)) {
+            return null;
+        }
+
+        return ProblemDetails::from(
+            type: 'about:blank',
+            title: 'Forbidden',
+            status: 403,
+            detail: 'A valid owner token is required to modify this offer.',
+            instance: $request->path(),
+        );
     }
 }

@@ -4,8 +4,9 @@ import type { EventDetail } from "@/types/types";
 import { redirect, type ActionFunctionArgs } from "react-router";
 import type { HashId } from "@/types/types";
 import { api } from "@/store/api";
-import { runMutation } from "@/utils";
+import { runMutation, runQuery } from "@/utils";
 import { store } from "@/store/store";
+import { eventEndIso } from "@/utils/date";
 
 export function Component() {
   const event = useRouteLoaderData("event-detail") as EventDetail;
@@ -22,6 +23,13 @@ export async function action({ params, request }: ActionFunctionArgs) {
 
   const entries = Object.fromEntries(formData.entries());
 
+  let eventDetail = api.endpoints.getEvent.select(eventHash)(store.getState())?.data;
+  if (!eventDetail) {
+    const eventSub = store.dispatch(api.endpoints.getEvent.initiate(eventHash));
+    eventDetail = await runQuery(eventSub, "Événement introuvable", 404);
+  }
+  const tokenExpiresAt = eventDetail ? eventEndIso(eventDetail) : undefined;
+
   const sub = store.dispatch(api.endpoints.createOffer.initiate({
     eventHash,
     payload: {
@@ -36,6 +44,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
       notes: (entries.notes as string) || null,
       phone: (entries.phone as string) || null,
     },
+    tokenExpiresAt,
   }));
 
   const { offer } = await runMutation(sub, "Unable to create offer", 500);

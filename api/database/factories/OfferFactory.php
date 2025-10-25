@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Event;
+use App\Models\Offer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -55,6 +56,8 @@ class OfferFactory extends Factory
             'address'         => $this->faker->address(),
             'lat'             => $this->faker->latitude(49.1545224, 43.860136),
             'lng'             => $this->faker->longitude(-1.5425988, 4.943467),
+            'token_hash'      => Offer::hashToken(bin2hex(random_bytes(16))),
+            'token_expires_at'=> now()->addWeeks(2),
         ];
     }
 
