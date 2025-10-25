@@ -1,8 +1,10 @@
 import { Link } from "react-router";
 import type { EventSummary } from "@/types/types";
 import { getImageUrl } from "@/store/api";
+import { useI18n } from "@/i18n/I18nProvider";
+import type { Locale } from "@/i18n/translations";
 
-function formatedDateRange(e: EventSummary) {
+function formatedDateRange(e: EventSummary, locale: Locale) {
   const start = new Date(e.start_date);
   const end = new Date(start);
   end.setDate(start.getDate() + e.days - 1);
@@ -11,15 +13,18 @@ function formatedDateRange(e: EventSummary) {
   const optionsSameMonth: Intl.DateTimeFormatOptions = { day: "numeric" };
   const optionsDiffMonth: Intl.DateTimeFormatOptions = { day: "numeric", month: "long" };
   const optionsEnd: Intl.DateTimeFormatOptions = { day: "numeric", month: "long" };
+  const localeTag = locale === "en" ? "en-US" : "fr-FR";
 
+  const separator = locale === "en" ? " to " : " au ";
   return (
-    start.toLocaleDateString("fr-FR", sameMonth ? optionsSameMonth : optionsDiffMonth) +
-    " au " +
-    end.toLocaleDateString("fr-FR", optionsEnd)
+    start.toLocaleDateString(localeTag, sameMonth ? optionsSameMonth : optionsDiffMonth) +
+    separator +
+    end.toLocaleDateString(localeTag, optionsEnd)
   );
 }
 
 function EventCard({ className, e }: { className?: string; e: EventSummary }) {
+  const { locale } = useI18n();
   return (
       <article
         style={{ fontSize: "16px" }}
@@ -47,7 +52,7 @@ function EventCard({ className, e }: { className?: string; e: EventSummary }) {
             </div>
 
             <div className="p-4 pt-0 flex w-full items-center justify-between text-sm @sm:text-base text-gray-600">
-              <span className="w-1/2">{formatedDateRange(e)}</span>
+              <span className="w-1/2">{formatedDateRange(e, locale)}</span>
               <span className="text-right">{e.loc_name}</span>
             </div>
           </div>

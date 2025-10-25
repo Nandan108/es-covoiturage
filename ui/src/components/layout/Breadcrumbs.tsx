@@ -15,11 +15,11 @@ export default function Breadcrumbs() {
     });
 
   return (
-    <nav className="py-2 px-4 text-sm text-gray-600 flex flex-wrap items-center gap-1">
+    <nav className="py-2 px-4 text-sm text-gray-600 flex flex-wrap items-center">
       {crumbs.map((crumb, i) => (
         <div className='text-nowrap max-w-[250px] overflow-ellipsis overflow-clip' key={i}>
           {i > 0 && <span className="text-gray-400">
-            <img src={lightblueCar} className="inline-block mx-2" width="25" />
+            <img src={lightblueCar} className="px-1 inline-block mx-2" width="25" />
             </span>}
           {crumb}
         </div>

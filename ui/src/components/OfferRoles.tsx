@@ -1,6 +1,7 @@
 import { Checkbox } from "radix-ui";
 import { CheckIcon } from "@radix-ui/react-icons";
 import { useEffect, useReducer, useRef } from "react";
+import { useI18n } from "@/i18n/I18nProvider";
 
 const MAX = { passenger: 10, driver: 10 };
 
@@ -45,6 +46,7 @@ function reducer(s: State, act: Act): State {
 export default function OfferRoles() {
   const [state, dispatch] = useReducer(reducer, { pssgnr: 1, driver: 0 });
   const { pssgnr, driver } = state;
+  const { t } = useI18n();
 
   const passengerRef = useRef<HTMLInputElement>(null);
   const driverRef = useRef<HTMLInputElement>(null);
@@ -62,7 +64,7 @@ export default function OfferRoles() {
 
   return (
     <div className="flex flex-col mb-4">
-      <p>Vous offrez d'être:</p>
+      <p>{t("offerRoles.prompt")}</p>
 
       <div className="flex flex-row gap-4 mb-1">
         <div className="w-32 flex items-center gap-2">
@@ -73,7 +75,7 @@ export default function OfferRoles() {
           >
             <Checkbox.Indicator>{passengerChecked && <CheckIcon className="text-lg" />}</Checkbox.Indicator>
           </Checkbox.Root>
-          <label htmlFor="pasngr_chk">Passager</label>
+          <label htmlFor="pasngr_chk">{t("offerRoles.passenger")}</label>
         </div>
 
         <div className="flex items-center gap-2">
@@ -91,7 +93,7 @@ export default function OfferRoles() {
             inputMode="numeric"
             required
           />
-          <label htmlFor="pasngr_seats">places souhaitées</label>
+          <label htmlFor="pasngr_seats">{t("offerRoles.passengerSeats")}</label>
         </div>
       </div>
 
@@ -104,7 +106,7 @@ export default function OfferRoles() {
           >
             <Checkbox.Indicator>{driverChecked && <CheckIcon className="text-lg" />}</Checkbox.Indicator>
           </Checkbox.Root>
-          <label htmlFor="driver_chk">Conducteur</label>
+          <label htmlFor="driver_chk">{t("offerRoles.driver")}</label>
         </div>
 
         <div className="flex items-center gap-2">
@@ -122,7 +124,7 @@ export default function OfferRoles() {
             inputMode="numeric"
             required
           />
-          <label htmlFor="driver_seats">places disponibles</label>
+          <label htmlFor="driver_seats">{t("offerRoles.driverSeats")}</label>
         </div>
       </div>
     </div>

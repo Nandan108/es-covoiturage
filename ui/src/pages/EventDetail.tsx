@@ -5,6 +5,7 @@ import { store } from "@/store/store";
 import { api } from "@/store/api";
 import { runQuery } from '@/utils';
 import EventDetailBody from "@/components/EventDetailBody";
+import { fallbackTranslate } from "@/i18n/utils";
 import { useOfferTokenCapture } from "@/hooks/useOfferTokenCapture";
 
 /* eslint-disable react-refresh/only-export-components */
@@ -28,6 +29,6 @@ export async function loader({ params }: LoaderFunctionArgs) {
   const hashId = params.id as HashId;
   const sub = store.dispatch(api.endpoints.getEvent.initiate(hashId));
 
-  const result = runQuery(sub, "Désolé, cet événement est introuvable", 404);
+  const result = runQuery(sub, fallbackTranslate("runQuery.eventNotFound"), 404);
   return result;
 }

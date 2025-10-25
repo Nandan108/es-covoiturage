@@ -42,7 +42,7 @@ describe("EventsList", () => {
 
   it("renders a friendly fallback when there are no events", () => {
     render(<EventsList events={[]} />);
-    expect(screen.getByText("No events found")).toBeInTheDocument();
+    expect(screen.getByText("Aucun événement trouvé")).toBeInTheDocument();
     expect(mockEventCard).not.toHaveBeenCalled();
   });
 

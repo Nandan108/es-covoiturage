@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useAutocompleteQuery, type Loc } from "@/services/locationApi";
 import AutocompleteInput from "./AutocompleteInput";
+import { useI18n } from "@/i18n/I18nProvider";
 
 type Props = {
   searchQuery: string;
@@ -21,6 +22,7 @@ function LocationSearch({
 
   const [open, setOpen] = useState(false);
   const debounced = useDebounce(searchQuery, 500);
+  const { t } = useI18n();
 
   const { data: results = [], isFetching } = useAutocompleteQuery(
     { query: debounced },
@@ -49,7 +51,7 @@ function LocationSearch({
       }}
       isLoading={isFetching}
       loadingClassName="opacity-50 bg-neutral-200"
-      loadingNode={<p className="text-sm absolute text-gray-500">Recherche en cours…</p>}
+      loadingNode={<p className="text-sm absolute text-gray-500">{t("locationSearch.loading")}</p>}
       {...props}
     />
   );

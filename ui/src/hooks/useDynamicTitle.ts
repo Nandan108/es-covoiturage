@@ -3,22 +3,29 @@ import { useEffect } from "react";
 import { useMatches } from "react-router";
 import type { UIMatch } from "react-router";
 import type { BreadcrumbHandle } from "@/types/router";
+import { useI18n } from "@/i18n/I18nProvider";
+import type { TranslationDescriptor } from "@/i18n/I18nProvider";
+
+type TitleValue = string | TranslationDescriptor | null | undefined;
 
 export function useDynamicTitle(base: string = "Home") {
   const matches = useMatches() as UIMatch<unknown, BreadcrumbHandle>[];
+  const { t } = useI18n();
 
   useEffect(() => {
     const titles: string[] = [base];
 
     for (const match of matches) {
-      const t = match.handle?.title;
-      if (!t) continue;
+      const titleValue = match.handle?.title;
+      if (!titleValue) continue;
 
-      if (typeof t === "function") {
-        const resolved = t(match);
-        if (resolved) titles.push(resolved);
+      const resolved: TitleValue = typeof titleValue === "function" ? titleValue(match) : titleValue;
+      if (!resolved) continue;
+
+      if (typeof resolved === "string") {
+        titles.push(resolved);
       } else {
-        titles.push(t);
+        titles.push(t(resolved.key, resolved.params));
       }
     }
 
@@ -26,5 +33,5 @@ export function useDynamicTitle(base: string = "Home") {
     // Reverse so breadcrumb hierarchy reads left-to-right visually,
     // but page title shows leaf-first
     document.title = titles.reverse().join(" | ");
-  }, [matches, base]);
+  }, [matches, base, t]);
 }

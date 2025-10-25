@@ -1,11 +1,13 @@
 import PageHeader from "@/components/layout/PageHeader";
 import { useRouteError, isRouteErrorResponse } from "react-router";
+import { useI18n } from "@/i18n/I18nProvider";
 
 function ErrorBoundary({ error }: { error?: Error }) {
   const routerError = useRouteError() as Error;
   error = error ?? routerError;
+  const { t } = useI18n();
 
-  let message = "Unknown error",
+  let message = t("error.unknown"),
     status = 500;
 
 
@@ -40,7 +42,7 @@ function ErrorBoundary({ error }: { error?: Error }) {
     <>
       <PageHeader />
       <main>
-        <h1 className="mb-8">Erreur {status}</h1>
+        <h1 className="mb-8">{t("error.heading", { status })}</h1>
         <p className="text-xl">{message}</p>
       </main>
     </>

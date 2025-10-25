@@ -1,6 +1,7 @@
 import { Link, useRouteLoaderData } from "react-router";
 import type { EventDetail, Offer } from "@/types/types";
 import { getOfferToken } from "@/utils/offerTokens";
+import { useI18n } from "@/i18n/I18nProvider";
 
 // icons
 import { MdOutlineLocationSearching } from "react-icons/md";
@@ -11,6 +12,7 @@ import { FaRegEdit } from "react-icons/fa";
 function OfferCard({ offer: o }: { offer: Offer }) {
   const event = useRouteLoaderData("event-detail") as EventDetail;
   const canEdit = !o.token_hash || Boolean(getOfferToken(o.id));
+  const { t } = useI18n();
 
   return (
     <div className="relative rounded-lg bg-white p-2 shadow-lg" key={o.id}>
@@ -25,7 +27,7 @@ function OfferCard({ offer: o }: { offer: Offer }) {
                 bg-gray-800 text-xs text-gray-100 rounded-md m-4 px-2 py-2 mx-auto"
             >
               <div className="mb-2 font-bold text-center pb-2 border-b border-gray-500">
-                Notes / précisions
+                {t("offerCard.notes")}
               </div>
               {o.notes}
             </span>
@@ -45,14 +47,14 @@ function OfferCard({ offer: o }: { offer: Offer }) {
       <div className="text-xs text-slate-600 leading-5 relative">
         {o.pasngr_seats ? (
           <div>
-            <b>Passager</b> ({o.pasngr_seats} place souhaitée)
+            <b>{t("offerCard.passenger")}</b> ({t("offerCard.passengerSeats", { count: o.pasngr_seats })})
           </div>
         ) : (
           ""
         )}
         {o.driver_seats ? (
           <div>
-            <b>Conducteur</b> ({o.driver_seats} place disponible(s))
+            <b>{t("offerCard.driver")}</b> ({t("offerCard.driverSeats", { count: o.driver_seats })})
           </div>
         ) : (
           ""
@@ -60,13 +62,13 @@ function OfferCard({ offer: o }: { offer: Offer }) {
         <div>{o.address}</div>
         {o.email_is_public ? (
           <div>
-            <b>Courriel:</b> {o.email}
+            <b>{t("offerCard.email")}:</b> {o.email}
           </div>
         ) : (
           ""
         )}
         <div className="flex-grow">
-          <b>Tél:</b> {o.phone}
+          <b>{t("offerCard.phone")}:</b> {o.phone}
         </div>
       </div>
     </div>

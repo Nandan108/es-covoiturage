@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 body {
-  @apply mx-auto my-10 p-2 max-w-6xl;
+  @apply mx-auto mt-4 p-2 max-w-6xl;
   background-color: #e4f9f3;
   /* @apply bg-cover bg-no-repeat;
   background-image: url(/images/background.jpg); */

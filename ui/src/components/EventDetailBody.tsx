@@ -8,6 +8,7 @@ import { Legend } from "./map/Legend"
 import type { MapActions } from "./map/EventMap"
 import EventMap from "./map/EventMap"
 import Leaflet from "leaflet";
+import { useI18n } from "@/i18n/I18nProvider";
 
 // function gmaps(lat: number, lng: number, label?: string) {
 //   return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}${label ? `&query_place_id=${encodeURIComponent(label)}` : ''}`
@@ -18,6 +19,7 @@ function EventDetailBody({ event, offerId }: { event: EventDetail, offerId: numb
   const { inBounds, outOfBounds } = usePartitionOffersByBounds(event.offers, bounds) // , { padding: 0.05 }
   const initialPosition = event.loc_lat && event.loc_lng ? Leaflet.latLng(event.loc_lat, event.loc_lng) : null
   const mapRef = useRef<MapActions>(null)
+  const { t } = useI18n();
 
   // On page load and on change of offerId value,
   // focus on the corresponding offer, if offerId is set
@@ -43,7 +45,7 @@ function EventDetailBody({ event, offerId }: { event: EventDetail, offerId: numb
           to={`/events/${event.hashId}/offers/new`}
         >
           <span className="mr-3">➕</span>
-          <span>Ajouter une offre ou une demande de covoiturage</span>
+          <span>{t("events.addOffer")}</span>
         </Link>
         <div className="flex flex-col md:flex-row justify-between items-center gap-x-6">
           <Legend />
@@ -52,7 +54,7 @@ function EventDetailBody({ event, offerId }: { event: EventDetail, offerId: numb
             target="_blank"
             href={event.loc_original_link}
           >
-            Ouvrir sur Google Maps
+            {t("events.openMaps")}
           </a>
         </div>
 
@@ -66,8 +68,8 @@ function EventDetailBody({ event, offerId }: { event: EventDetail, offerId: numb
       </div>
 
       <div className="offers-container">
-        <OffersGrid title="Sur la carte" offers={inBounds} />
-        <OffersGrid title="Autres offres (hors cadre)" offers={outOfBounds} dim />
+        <OffersGrid title={t("events.offers.inBounds")} offers={inBounds} />
+        <OffersGrid title={t("events.offers.outOfBounds")} offers={outOfBounds} dim />
       </div>
     </div>
   )

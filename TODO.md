@@ -1,5 +1,4 @@
 # TODO
-06. Translations (EN, FR)
 07. Add Admin pages
     * index (liste of events)
     * event page create mode
@@ -27,3 +26,4 @@
 16. Add ui- and api- test jobs + psalm check to CI pipeline
 02. Add unit tests (both api and ui)
 04. Token-based security for editing offers
+06. Translations (EN, FR)

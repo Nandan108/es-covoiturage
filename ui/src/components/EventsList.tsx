@@ -1,8 +1,10 @@
 import EventCard from "@/components/EventCard";
 import type { EventSummary } from "@/types/types";
+import { useI18n } from "@/i18n/I18nProvider";
 
 
 export default function EventsList({ events }: { events: EventSummary[] }) {
+  const { t } = useI18n();
 
   // organize events by year ASC, sorted date ASC (upcoming first)
   const evtByYear = Object.entries(
@@ -20,7 +22,7 @@ export default function EventsList({ events }: { events: EventSummary[] }) {
     .sort((a, b) => a.year - b.year);
 
   if (events.length === 0) {
-    return <div className="p-4">No events found</div>;
+    return <div className="p-4">{t("events.list.empty")}</div>;
   }
 
   return (

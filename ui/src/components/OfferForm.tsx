@@ -8,6 +8,7 @@ import LocationSearch from "./locationSearch";
 import { Legend } from "./map/Legend";
 import EventCard from "./EventCard";
 import { FaTrash } from "react-icons/fa";
+import { useI18n } from "@/i18n/I18nProvider";
 
 export default function OfferForm({ event, offer }: { event: EventDetail; offer?: Offer }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,6 +23,7 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
 
   const fetcher = useFetcher();
   const navigation = useNavigation();
+  const { t } = useI18n();
 
   const form = {
     eventHash: event.hashId,
@@ -52,7 +54,7 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
     <div className="mx-auto p-4">
       <EventCard e={event} className="mb-6" />
       <h1 className="text-2xl font-semibold mb-4">
-        {editing ? "Modifier une offre" : "Nouvelle offre / demande"}
+        {editing ? t("offerForm.title.edit") : t("offerForm.title.new")}
       </h1>
 
       <Form method="post" className="space-y-6">
@@ -61,17 +63,17 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block">
-            <span className="block text-sm mb-1">Nom</span>
+            <span className="block text-sm mb-1">{t("offerForm.labels.name")}</span>
             <input className="input" name="name" defaultValue={form.name} required />
           </label>
 
           <label className="block">
-            <span className="block text-sm mb-1">Email</span>
+            <span className="block text-sm mb-1">{t("offerForm.labels.email")}</span>
             <input className="input" name="email" type="email" defaultValue={form.email} required />
           </label>
 
           <label className="block">
-            <span className="block text-sm mb-1">Téléphone</span>
+            <span className="block text-sm mb-1">{t("offerForm.labels.phone")}</span>
             <input className="input" name="phone" type="tel" defaultValue={form.phone} />
           </label>
 
@@ -79,7 +81,7 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
 
           <label className="block">
             <div className="block text-sm mb-1">
-              Votre lieu de départ <i className="text-gray-500 text-xs">(affiché sur l'offre)</i>
+              {t("offerForm.labels.location")} <i className="text-gray-500 text-xs">{t("offerForm.labels.locationHint")}</i>
             </div>
             <input ref={addressRef} className="input" name="address" defaultValue={form.address} required/>
           </label>
@@ -87,14 +89,14 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
 
         <div className="form-group">
           <label htmlFor="address" id="address_label">
-            Cherchez votre lieu de départ ici ou indiquez le directement sur la carte.
+            {t("offerForm.labels.location")}
           </label>
           <LocationSearch
             searchQuery={searchQuery}
             onSearchQueryChange={setSearchQuery}
             onFocus={() => setSearchQuery(searchQuery || (addressRef.current?.value ?? ""))}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Adresse, ville, code postal, pays…"
+            placeholder={t("locationSearch.placeholder")}
             aria-labelledby="address_label"
             ref={locationSearchRef}
             onSelectLocation={handleSelectLocation}
@@ -103,10 +105,10 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
 
         <div className="form-group mt-2 mb-1 text-slate-500">
           <div className="flex flex-col sm:flex-row sm:items-center">
-            <span className="mr-4">Coordonnées de votre lieu de départ: </span>
+            <span className="mr-4">{t("offerForm.labels.coordinates")}: </span>
             <div className="flex items-center mt-2 sm:mt-0">
               <span>
-                lat:
+                {t("offerForm.labels.lat")}:
                 <input
                   type="text"
                   name="lat"
@@ -117,7 +119,7 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
                 />
               </span>
               <span>
-                lng:
+                {t("offerForm.labels.lng")}:
                 <input
                   type="text"
                   name="lng"
@@ -144,7 +146,7 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
         />
 
         <label className="block">
-          <span className="block text-sm mb-1">Notes / Précisions</span>
+          <span className="block text-sm mb-1">{t("offerForm.labels.notes")}</span>
           <textarea name="notes" className="input" defaultValue={form.notes ?? ""} />
         </label>
 
@@ -162,23 +164,23 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
 
         <div className="flex gap-3 justify-between">
           <button type="submit" className="btn" disabled={isSubmitting || isDeleting}>
-            {isSubmitting
-              ? editing
-                ? "Enregistrement…"
-                : "Création…"
-              : editing
-              ? "Enregistrer"
-              : "Créer"}
+            {editing
+              ? isSubmitting
+                ? t("offerForm.buttons.saving")
+                : t("offerForm.buttons.save")
+              : isSubmitting
+                ? t("offerForm.buttons.creating")
+                : t("offerForm.buttons.create")}
           </button>
           {editing && (
             <button
               className="btn bg-red-200 text-red-800"
               type="submit"
-              title="Supprimer cette offre"
+              title={t("offerForm.buttons.delete")}
               form="delete-offer-form"
               disabled={isDeleting || isSubmitting}
             >
-              {isDeleting ? "Suppression…" : <FaTrash className="inline" />}
+              {isDeleting ? t("offerForm.buttons.deleting") : <FaTrash className="inline" />}
             </button>
           )}
         </div>
