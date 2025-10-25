@@ -5,6 +5,10 @@
     * event page create mode
     * event page edit mode
 14. Add notification snack bar
+17. Once all old offers without token_hash have expired, make token_hash non-nullable in DB,
+    and remove code that works with null token_hash:
+    - api: Offer::tokenIsValid(), testLegacyOffersWithoutTokenCanBeUpdated()
+    - ui: OfferCard() { const canEdit; }, types.ts/Offer.token_hash
 
 # DONE!
 01. Set up CI/CD

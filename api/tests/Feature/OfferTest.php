@@ -130,4 +130,17 @@ final class OfferTest extends ApiTestCase
         $this->deleteJson($uri)
             ->assertForbidden();
     }
+
+    public function testLegacyOffersWithoutTokenCanBeUpdated(): void
+    {
+        $event = $this->randomEvent();
+        $offer = $event->offers()->inRandomOrder()->firstOrFail();
+        $offer->token_hash = null;
+        $offer->token_expires_at = null;
+        $offer->save();
+
+        $uri = route('events.offers.update', ['event' => $event->hashId, 'offer' => $offer->id]);
+        $this->patchJson($uri, ['name' => 'Legacy update'])
+            ->assertOk();
+    }
 }

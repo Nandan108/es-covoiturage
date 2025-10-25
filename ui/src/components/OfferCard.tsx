@@ -10,7 +10,7 @@ import { FaRegEdit } from "react-icons/fa";
 
 function OfferCard({ offer: o }: { offer: Offer }) {
   const event = useRouteLoaderData("event-detail") as EventDetail;
-  const hasEditToken = Boolean(getOfferToken(o.id));
+  const canEdit = !o.token_hash || Boolean(getOfferToken(o.id));
 
   return (
     <div className="relative rounded-lg bg-white p-2 shadow-lg" key={o.id}>
@@ -36,7 +36,7 @@ function OfferCard({ offer: o }: { offer: Offer }) {
             className="fa-solid fa-magnifying-glass cursor-pointer"
           />
         </Link>
-        {hasEditToken ? (
+        {canEdit ? (
           <Link to={`/events/${event.hashId}/offers/${o.id}/edit`} className="block cursor-pointer">
             <FaRegEdit />
           </Link>

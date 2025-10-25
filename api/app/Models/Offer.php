@@ -64,11 +64,15 @@ final class Offer extends Model
 
     public function tokenIsValid(?string $token): bool
     {
-        if (null === $token || null === $this->token_hash || null === $this->token_expires_at) {
+        if (null === $this->token_hash) {
+            return true; // legacy offers: no token required
+        }
+
+        if (null === $token) {
             return false;
         }
 
-        if ($this->token_expires_at->isPast()) {
+        if (null !== $this->token_expires_at && $this->token_expires_at->isPast()) {
             return false;
         }
 
