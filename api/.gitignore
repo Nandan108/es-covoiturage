@@ -25,3 +25,8 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Ignore Psysh history and config files (used by artisan tinker)
+# Prod needs these because writing to /home/clients/.../.config/psysh is not allowed
+/.psysh.php
+/storage/psysh/

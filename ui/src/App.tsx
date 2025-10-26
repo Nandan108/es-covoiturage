@@ -1,11 +1,12 @@
 import { Provider } from "react-redux";
 import { Suspense } from "react";
-import { createBrowserRouter, NavLink, RouterProvider } from "react-router";
+import { createBrowserRouter, Navigate, NavLink, RouterProvider, type UIMatch } from "react-router";
 import { store } from "./store/store";
 import ErrorBoundary from "./pages/ErrorBoundary";
 import Layout from "./components/layout/Layout";
 import type { BreadcrumbHandle } from "./types/router";
 import type { EventDetail, Offer } from "./types/types";
+import type { AdminEvent } from "./admin/types";
 import { useI18n } from "./i18n/I18nProvider";
 import type { TranslationDescriptor } from "./i18n/I18nProvider";
 import type { TranslationKey } from "./i18n/translations";
@@ -25,9 +26,24 @@ const EventBreadcrumb = ({ path, event }: { path: string; event?: EventDetail })
   );
 };
 
-const TranslatedText = ({ i18nKey }: { i18nKey: TranslationKey }) => {
+const TranslatedText = ({
+  i18nKey,
+  params,
+}: {
+  i18nKey: TranslationKey;
+  params?: Record<string, string>;
+}) => {
   const { t } = useI18n();
-  return <>{t(i18nKey)}</>;
+  return <>{t(i18nKey, params)}</>;
+};
+
+const AdminEventBreadcrumb = (match: UIMatch<AdminEvent>) => {
+  const event = match.loaderData as AdminEvent | undefined;
+  return (
+    <NavLink to={match.pathname} end>
+      {event ? event.name : <TranslatedText i18nKey="admin.events.links.edit" />}
+    </NavLink>
+  );
 };
 
 const router = createBrowserRouter([
@@ -52,7 +68,10 @@ const router = createBrowserRouter([
         },
         handle: {
           breadcrumb: (match) => (
-            <EventBreadcrumb path={match.pathname} event={match.loaderData as EventDetail | undefined} />
+            <EventBreadcrumb
+              path={match.pathname}
+              event={match.loaderData as EventDetail | undefined}
+            />
           ),
           title: (match) => {
             const event = match.loaderData as EventDetail | undefined;
@@ -95,11 +114,89 @@ const router = createBrowserRouter([
               title: (match) => {
                 const offer = match.loaderData as Offer | undefined;
                 if (offer) {
-                  return { key: "offerForm.title.editWithName", params: { name: offer.name } } as TranslationDescriptor;
+                  return {
+                    key: "offerForm.title.editWithName",
+                    params: { name: offer.name },
+                  } as TranslationDescriptor;
                 }
                 return { key: "offerForm.title.edit" } as TranslationDescriptor;
               },
             } as BreadcrumbHandle<Offer>,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: "/admin",
+    errorElement: <ErrorBoundary />,
+    children: [
+      {
+        index: true,
+        element: <Navigate to="/admin/events" replace />,
+      },
+      {
+        path: "login",
+        lazy: async () => import("./pages/admin/AdminLogin"),
+      },
+      {
+        path: "",
+        handle: {
+          breadcrumb: () => <TranslatedNavLink to="/admin/events" i18nKey="admin.title" />,
+        },
+        lazy: async () => {
+          const module = await import("./pages/admin/AdminLayout");
+          return { Component: module.default };
+        },
+        children: [
+          {
+            index: true,
+            element: <Navigate to="/admin/events" replace />,
+          },
+          {
+            path: "events",
+            lazy: async () => {
+              const module = await import("./pages/admin/AdminEventsPage");
+              return {
+                Component: module.Component,
+                loader: module.loader,
+                handle: {
+                  breadcrumb: (match: UIMatch) => (
+                    <TranslatedNavLink to={match.pathname} i18nKey="admin.nav.events" />
+                  ),
+                },
+              };
+            },
+          },
+          {
+            path: "events/new",
+            lazy: async () => {
+              const module = await import("./pages/admin/AdminEventCreatePage");
+              return {
+                Component: module.Component,
+                loader: module.loader,
+                action: module.action,
+                handle: {
+                  breadcrumb: (match: UIMatch) => (
+                    <TranslatedNavLink to={match.pathname} i18nKey="admin.events.new" />
+                  ),
+                },
+              };
+            },
+          },
+          {
+            path: "events/:eventId/edit",
+            lazy: async () => {
+              const module = await import("./pages/admin/AdminEventEditPage");
+              return {
+                Component: module.Component,
+                loader: module.loader,
+                action: module.action,
+                handle: {
+                  breadcrumb: (match: UIMatch<AdminEvent>) => AdminEventBreadcrumb(match),
+                } as BreadcrumbHandle<AdminEvent>,
+              };
+            },
           },
         ],
       },

@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\AdminEventController;
 use App\Models\Image;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
@@ -28,3 +30,15 @@ Route::get('/images/events/{filename}', function (string $filename) {
         'Cache-Control' => 'public, max-age=31536000, immutable',
     ]);
 })->where('filename', '[A-Za-z0-9._-]+');
+
+// Admin API needs the full "web" middleware stack (sessions, cookies, CSRF) so it
+// lives here rather than in routes/api.php. Endpoints still return JSON.
+Route::prefix('api/admin')->middleware('web')->group(function () {
+    Route::post('login', [AdminAuthController::class, 'login'])->name('admin.login');
+
+    Route::middleware('auth:admin')->group(function () {
+        Route::post('logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+        Route::get('me', [AdminAuthController::class, 'me']);
+        Route::apiResource('events', AdminEventController::class);
+    });
+});

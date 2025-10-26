@@ -2,14 +2,18 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import ErrorBoundary from "@/pages/ErrorBoundary";
 
-const routeErrorRef = vi.hoisted(() => ({
+type RouterErrorResponse = { status: number; data?: unknown };
+
+const routeErrorRef = vi.hoisted<{ value: unknown }>(() => ({
   value: new Error("default"),
 }));
 
 vi.mock("react-router", () => ({
   useRouteError: () => routeErrorRef.value,
-  isRouteErrorResponse: (error: unknown): error is { status: number; data?: unknown } =>
-    typeof (error as any)?.status === "number",
+  isRouteErrorResponse: (error: unknown): error is RouterErrorResponse =>
+    typeof error === "object" &&
+    error !== null &&
+    typeof (error as { status?: unknown }).status === "number",
 }));
 
 vi.mock("@/components/layout/PageHeader", () => ({
@@ -31,7 +35,8 @@ describe("ErrorBoundary page", () => {
   });
 
   it("displays router error responses with their status and detail", () => {
-    routeErrorRef.value = { status: 404, data: "Introuvable" } as any;
+    const notFoundError: RouterErrorResponse = { status: 404, data: "Introuvable" };
+    routeErrorRef.value = notFoundError;
 
     render(<ErrorBoundary />);
 

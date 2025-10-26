@@ -1,8 +1,4 @@
 # TODO
-07. Add Admin pages
-    * index (liste of events)
-    * event page create mode
-    * event page edit mode
 14. Add notification snack bar
 17. Once all old offers without token_hash have expired, make token_hash non-nullable in DB,
     and remove code that works with null token_hash:
@@ -27,3 +23,4 @@
 02. Add unit tests (both api and ui)
 04. Token-based security for editing offers
 06. Translations (EN, FR)
+07. Add Admin pages

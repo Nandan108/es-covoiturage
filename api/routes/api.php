@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\EventController;
-use App\Http\Controllers\MyEventController;
 use App\Http\Controllers\OfferController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,7 +12,5 @@ Route::resource('events', EventController::class)
 Route::resource('events.offers', OfferController::class)
     ->only(['show', 'store', 'update', 'destroy']);
 
-// Route::middleware('auth')->group(function () {
-//     Route::resource('my-events', MyEventController::class);
-//     Route::delete('auth', [AuthController::class, 'destroy'])->name('logout');
-// });
+// Note that admin routes are defined in routes/web.php, so they get
+// the full "web" middleware stack (sessions, cookies, CSRF)

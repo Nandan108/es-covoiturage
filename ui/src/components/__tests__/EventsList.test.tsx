@@ -3,9 +3,9 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import EventsList from "@/components/EventsList";
 import type { EventSummary } from "@/types/types";
 
-const mockEventCard = vi.fn(
-  ({ e }: { e: EventSummary; className?: string }) => <li data-testid="event-card">{e.name}</li>
-);
+const mockEventCard = vi.fn(({ e }: { e: EventSummary; className?: string }) => (
+  <li data-testid="event-card">{e.name}</li>
+));
 
 vi.mock("@/components/EventCard", () => ({
   __esModule: true,
@@ -71,11 +71,8 @@ describe("EventsList", () => {
     expect(headings.map((h) => h.textContent)).toEqual(["2024", "2025"]);
 
     expect(mockEventCard).toHaveBeenCalledTimes(events.length);
-    const renderedOrder = mockEventCard.mock.calls.map(([props]) => (props as any).e.name);
-    expect(renderedOrder).toEqual([
-      "Rencontre de février",
-      "Retraite de mars",
-      "Stage de janvier",
-    ]);
+    type EventCardProps = Parameters<typeof mockEventCard>[0];
+    const renderedOrder = mockEventCard.mock.calls.map(([props]: [EventCardProps]) => props.e.name);
+    expect(renderedOrder).toEqual(["Rencontre de février", "Retraite de mars", "Stage de janvier"]);
   });
 });
