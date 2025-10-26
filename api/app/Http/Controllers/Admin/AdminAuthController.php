@@ -9,7 +9,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class AdminAuthController extends Controller
+/** @psalm-suppress UnusedClass */
+final class AdminAuthController extends Controller
 {
     public function login(Request $request): JsonResponse
     {
@@ -53,7 +54,7 @@ class AdminAuthController extends Controller
         return response()->json(['message' => 'ok']);
     }
 
-    public function me(Request $request): JsonResponse
+    public function me(): JsonResponse
     {
         $admin = Auth::guard('admin')->user();
         if (!$admin) {

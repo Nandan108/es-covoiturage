@@ -7,6 +7,7 @@ import AdminEventForm from "./AdminEventForm";
 import { store } from "@/store/store";
 import { runMutation } from "@/utils/runApi";
 import { formDataToEventValues } from "@/admin/formData";
+import { appendNotice } from "@/utils/url";
 
 /* eslint-disable react-refresh/only-export-components */
 
@@ -31,6 +32,6 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const values = formDataToEventValues(formData);
   const sub = store.dispatch(adminApi.endpoints.createEvent.initiate(values));
-  const event = await runMutation(sub, "Impossible de créer l'événement", 422);
-  return redirect(`/admin/events/${event.hashId}/edit`);
+  await runMutation(sub, "Impossible de créer l'événement", 422);
+  return redirect(appendNotice("/admin/events", "admin_event_created"));
 }

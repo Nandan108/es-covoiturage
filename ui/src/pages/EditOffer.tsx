@@ -7,6 +7,7 @@ import type { HashId } from "@/types/types";
 import { store } from "@/store/store";
 import { api } from "@/store/api";
 import { useOfferTokenCapture } from "@/hooks/useOfferTokenCapture";
+import { appendNotice } from "@/utils/url";
 
 export function Component() {
   // get event from parent route loader data
@@ -36,11 +37,11 @@ export async function action({ params, request }: ActionFunctionArgs) {
 
   if (request.method === "DELETE") {
     await deleteOffer(eventHash, offerId);
-  } else {
-    await updateOffer(eventHash, offerId, formData);
+    return redirect(appendNotice(`/events/${eventHash}`, "offer_deleted"));
   }
 
-  return redirect(`/events/${eventHash}/offers/${offerId}`); // back to event detail
+  await updateOffer(eventHash, offerId, formData);
+  return redirect(appendNotice(`/events/${eventHash}/offers/${offerId}`, "offer_updated"));
 }
 
 async function deleteOffer(eventHash: string, offerId: number) {

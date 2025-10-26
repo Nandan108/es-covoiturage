@@ -3,6 +3,14 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { EventSummary, EventDetail, Offer, HashId, Meta } from "@/types/types";
 import { getOfferToken, rememberOfferToken } from "@/utils/offerTokens";
 
+type OfferCreatePayload = Omit<
+  Offer,
+  "id" | "eventHash" | "created_at" | "updated_at" | "token_hash" | "token_expires_at"
+> & {
+  token_hash?: Offer["token_hash"];
+  token_expires_at?: Offer["token_expires_at"];
+};
+
 export type Api = typeof api;
 
 export const api = createApi({
@@ -24,7 +32,7 @@ export const api = createApi({
       { offer: Offer; edit_token: string, expires_at: string },
       {
         eventHash: HashId;
-        payload: Omit<Offer, "id" | "eventHash" | "created_at" | "updated_at">;
+        payload: OfferCreatePayload;
       }
     >({
       query: ({ eventHash, payload }) => ({
@@ -42,6 +50,8 @@ export const api = createApi({
           created_at: now,
           updated_at: now,
           ...payload,
+          token_hash: payload.token_hash ?? null,
+          token_expires_at: payload.token_expires_at ?? null,
         };
 
         // 1.a) Update the event detail cache

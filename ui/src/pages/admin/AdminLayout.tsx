@@ -5,6 +5,7 @@ import { type AdminUser, adminApi, useCurrentAdminQuery, useLogoutMutation } fro
 import { useI18n } from "@/i18n/I18nProvider";
 import Footer from "@/components/layout/Footer";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
+import { useFlashNotice } from "@/hooks/useFlashNotice";
 
 type AdminOutletContext = {
   admin: AdminUser;
@@ -22,6 +23,7 @@ function AdminLayout() {
   const dispatch = useDispatch();
   const { data: admin, isLoading, error, refetch } = useCurrentAdminQuery();
   const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
+  useFlashNotice();
 
   const handleLogout = async () => {
     try {

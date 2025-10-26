@@ -29,6 +29,8 @@ function makeOffer(overrides: Partial<Offer> = {}): Offer {
     email_is_public: overrides.email_is_public ?? true,
     driver_seats: overrides.driver_seats ?? 1,
     pasngr_seats: overrides.pasngr_seats ?? 0,
+    token_hash: overrides.token_hash ?? null,
+    token_expires_at: overrides.token_expires_at ?? null,
     created_at: overrides.created_at ?? "2025-01-01T00:00:00Z",
     updated_at: overrides.updated_at ?? "2025-01-01T00:00:00Z",
   };

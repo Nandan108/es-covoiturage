@@ -1,5 +1,4 @@
 # TODO
-14. Add notification snack bar
 17. Once all old offers without token_hash have expired, make token_hash non-nullable in DB,
     and remove code that works with null token_hash:
     - api: Offer::tokenIsValid(), testLegacyOffersWithoutTokenCanBeUpdated()
@@ -24,3 +23,4 @@
 04. Token-based security for editing offers
 06. Translations (EN, FR)
 07. Add Admin pages
+14. Add notification snack bar (flash toasts)

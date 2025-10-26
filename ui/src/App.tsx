@@ -7,6 +7,7 @@ import Layout from "./components/layout/Layout";
 import type { BreadcrumbHandle } from "./types/router";
 import type { EventDetail, Offer } from "./types/types";
 import type { AdminEvent } from "./admin/types";
+import { NotificationProvider } from "@/components/notifications/NotificationProvider";
 import { useI18n } from "./i18n/I18nProvider";
 import type { TranslationDescriptor } from "./i18n/I18nProvider";
 import type { TranslationKey } from "./i18n/translations";
@@ -207,11 +208,13 @@ const router = createBrowserRouter([
 function App() {
   const { t } = useI18n();
   return (
-    <Provider store={store}>
-      <Suspense fallback={<div className="p-4">{t("app.loading")}</div>}>
-        <RouterProvider router={router} />
-      </Suspense>
-    </Provider>
+    <NotificationProvider>
+      <Provider store={store}>
+        <Suspense fallback={<div className="p-4">{t("app.loading")}</div>}>
+          <RouterProvider router={router} />
+        </Suspense>
+      </Provider>
+    </NotificationProvider>
   );
 }
 

@@ -6,7 +6,7 @@ import type { HashId } from "@/types/types";
 import { api } from "@/store/api";
 import { runMutation, runQuery } from "@/utils";
 import { store } from "@/store/store";
-import { eventEndIso } from "@/utils/date";
+import { appendNotice } from "@/utils/url";
 
 export function Component() {
   const event = useRouteLoaderData("event-detail") as EventDetail;
@@ -28,7 +28,6 @@ export async function action({ params, request }: ActionFunctionArgs) {
     const eventSub = store.dispatch(api.endpoints.getEvent.initiate(eventHash));
     eventDetail = await runQuery(eventSub, "Événement introuvable", 404);
   }
-  const tokenExpiresAt = eventDetail ? eventEndIso(eventDetail) : undefined;
 
   const sub = store.dispatch(api.endpoints.createOffer.initiate({
     eventHash,
@@ -43,11 +42,12 @@ export async function action({ params, request }: ActionFunctionArgs) {
       pasngr_seats: Number(entries.pasngr_seats),
       notes: (entries.notes as string) || null,
       phone: (entries.phone as string) || null,
+      token_hash: null,
+      token_expires_at: null,
     },
-    tokenExpiresAt,
   }));
 
   const { offer } = await runMutation(sub, "Unable to create offer", 500);
 
-  return redirect(`/events/${eventHash}/offers/${offer.id}`); // back to event detail
+  return redirect(appendNotice(`/events/${eventHash}/offers/${offer.id}`, "offer_created"));
 }

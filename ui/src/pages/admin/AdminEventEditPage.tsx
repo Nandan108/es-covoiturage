@@ -7,6 +7,7 @@ import AdminEventForm from "./AdminEventForm";
 import { store } from "@/store/store";
 import { runMutation, runQuery } from "@/utils/runApi";
 import { formDataToEventValues } from "@/admin/formData";
+import { appendNotice } from "@/utils/url";
 import { useI18n } from "@/i18n/I18nProvider";
 
 /* eslint-disable react-refresh/only-export-components */
@@ -81,12 +82,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (request.method.toUpperCase() === "DELETE") {
     const sub = store.dispatch(adminApi.endpoints.deleteEvent.initiate(hashId));
     await runMutation(sub, "Impossible de supprimer l'événement", 500);
-    return redirect("/admin/events");
+    return redirect(appendNotice("/admin/events", "admin_event_deleted"));
   }
 
   const formData = await request.formData();
   const values = formDataToEventValues(formData);
   const sub = store.dispatch(adminApi.endpoints.updateEvent.initiate({ hashId, values }));
   await runMutation(sub, "Impossible de mettre à jour l'événement", 422);
-  return redirect("/admin/events");
+  return redirect(appendNotice("/admin/events", "admin_event_updated"));
 }

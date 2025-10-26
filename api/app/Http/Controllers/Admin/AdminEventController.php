@@ -10,7 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rule;
 
-class AdminEventController extends Controller
+/** @psalm-suppress UnusedClass */
+final class AdminEventController extends Controller
 {
     public function index(): JsonResponse
     {
