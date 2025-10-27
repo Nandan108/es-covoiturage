@@ -6,6 +6,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import Footer from "@/components/layout/Footer";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import { useFlashNotice } from "@/hooks/useFlashNotice";
+import { useDynamicTitle } from "@/hooks/useDynamicTitle";
 
 type AdminOutletContext = {
   admin: AdminUser;
@@ -23,6 +24,7 @@ function AdminLayout() {
   const dispatch = useDispatch();
   const { data: admin, isLoading, error, refetch } = useCurrentAdminQuery();
   const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
+  useDynamicTitle(t("app.title"));
   useFlashNotice();
 
   const handleLogout = async () => {
@@ -57,7 +59,7 @@ function AdminLayout() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-100">
+    <div className="flex min-h-screen flex-col bg-slate-200">
       <header className="bg-slate-900 px-6 py-4 text-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <div>
@@ -76,11 +78,11 @@ function AdminLayout() {
         </div>
       </header>
       <div className="bg-slate-200/60">
-        <div className="mx-auto w-full max-w-6xl px-6">
+        <div className="mx-auto w-full max-w-6xl px-2 py-1">
           <Breadcrumbs />
         </div>
       </div>
-      <div className="mx-auto w-full max-w-6xl flex-1 px-6 py-2">
+      <div className="mx-auto w-full max-w-6xl flex-1 px-6">
         <section className="rounded-2xl bg-white px-8 py-4 shadow-lg">
           <Outlet context={{ admin }} />
         </section>

@@ -3,7 +3,7 @@ import { translations, type Locale, type TranslationKey } from "./translations";
 
 const STORAGE_KEY = "es:locale";
 
-type Params = Record<string, string | number> | undefined;
+export type Params = Record<string, string | number> | undefined;
 
 type TranslationDescriptor = {
   key: TranslationKey;

@@ -7,6 +7,7 @@ import { L as Leaflet } from "./markerIcons";
 import BoundsWatcher from "./BoundsWatcher";
 import { iconForOffer, icons } from "./markerIcons";
 import type { Offer } from "@/types/types";
+import { useI18n } from "@/i18n/I18nProvider";
 
 export type MapActions = {
   focusOffer: (
@@ -30,6 +31,7 @@ const EventMap = forwardRef<MapActions, Props>(function (
   { event, onBoundsChange, zoom = 13, className = "h-96 w-full", setLocation, initialPosition },
   ref
 ) {
+  const { t } = useI18n();
   // Marker registry
   const markersRef = useRef(new Map<number, L.Marker>());
   const centerLL = useMemo(
@@ -89,8 +91,6 @@ const EventMap = forwardRef<MapActions, Props>(function (
           // Build bounds that include event center + chosen offer, then pad ~10%
           const bounds = Leaflet.latLngBounds(centerLL, offerLL).pad(paddingRatio);
 
-          console.log("Focusing map on offer", offerId, "at", offerLL, "with bounds", bounds);
-
           // Fit to those bounds; cap zoom so we don’t over-zoom on very close points
           if (opts?.openPopup !== false) {
             m.openPopup();
@@ -118,7 +118,7 @@ const EventMap = forwardRef<MapActions, Props>(function (
 
   function LocationMarker({
     initialPosition,
-    popupContent = "Votre point de départ",
+    popupContent = t("legend.origin"),
   }: {
     initialPosition?: L.LatLng | null;
     popupContent?: React.ReactNode;
@@ -162,9 +162,9 @@ const EventMap = forwardRef<MapActions, Props>(function (
 
       {/* Offer markers */}
       {event.offers.map((o) => {
-        const roles = [o.pasngr_seats ? "Passenger" : null, o.driver_seats ? "Driver" : null]
-          .filter(Boolean)
-          .join(" or ");
+        const role = t(o.pasngr_seats && o.driver_seats
+            ? "legend.both"
+            : o.pasngr_seats ? "legend.passenger" : "legend.driver");
         return (
           <Marker
             key={o.id}
@@ -173,12 +173,12 @@ const EventMap = forwardRef<MapActions, Props>(function (
             icon={iconForOffer(o)}
           >
             <Popup className="text-nowrap fit-content">
-              <b>{o.name}</b> ({roles})<br />
+              <b>{o.name}</b> ({role})<br />
               {o.address}
               <br />
               {o.phone && (
                 <>
-                  <b>Tél:</b> {o.phone}
+                  <b>{t("offerCard.phone")}{t("colon")}</b> {o.phone}
                 </>
               )}
             </Popup>

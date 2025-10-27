@@ -19,7 +19,7 @@ export function useDynamicTitle(base: string = "Home") {
       const titleValue = match.handle?.title;
       if (!titleValue) continue;
 
-      const resolved: TitleValue = typeof titleValue === "function" ? titleValue(match) : titleValue;
+      const resolved: TitleValue = typeof titleValue === "function" ? titleValue(match, t) : titleValue;
       if (!resolved) continue;
 
       if (typeof resolved === "string") {

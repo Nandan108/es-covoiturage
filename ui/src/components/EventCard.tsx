@@ -30,7 +30,7 @@ function EventCard({ className, e }: { className?: string; e: EventSummary }) {
         style={{ fontSize: "16px" }}
         className={[
           "@container",
-          "overflow-hidden rounded-2xl bg-white shadow-sm",
+          "overflow-hidden rounded-2xl bg-white shadow-md shadow-black/20",
           className,
         ].join(" ")}
       >

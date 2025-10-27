@@ -14,7 +14,7 @@ import type { TranslationKey } from "./i18n/translations";
 
 const TranslatedNavLink = ({ to, i18nKey }: { to: string; i18nKey: TranslationKey }) => {
   const { t } = useI18n();
-  return <NavLink to={to}>{t(i18nKey)}</NavLink>;
+  return <NavLink to={to} end>{t(i18nKey)}</NavLink>;
 };
 
 const EventBreadcrumb = ({ path, event }: { path: string; event?: EventDetail }) => {
@@ -47,10 +47,16 @@ const AdminEventBreadcrumb = (match: UIMatch<AdminEvent>) => {
   );
 };
 
+const LoadingFallback = () => {
+  const { t } = useI18n();
+  return <div className="p-4">{t("app.loading")}</div>;
+};
+
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
+    hydrateFallbackElement: <LoadingFallback />,
     errorElement: <ErrorBoundary />,
     handle: {
       breadcrumb: () => <TranslatedNavLink to="/" i18nKey="breadcrumb.home" />,
@@ -130,6 +136,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/admin",
+    hydrateFallbackElement: <LoadingFallback />,
     errorElement: <ErrorBoundary />,
     children: [
       {
@@ -159,12 +166,12 @@ const router = createBrowserRouter([
             lazy: async () => {
               const module = await import("./pages/admin/AdminEventsPage");
               return {
-                Component: module.Component,
-                loader: module.loader,
+                ...module,
                 handle: {
                   breadcrumb: (match: UIMatch) => (
                     <TranslatedNavLink to={match.pathname} i18nKey="admin.nav.events" />
                   ),
+                  title: { key: "admin.nav.events" },
                 },
               };
             },
@@ -181,6 +188,7 @@ const router = createBrowserRouter([
                   breadcrumb: (match: UIMatch) => (
                     <TranslatedNavLink to={match.pathname} i18nKey="admin.events.new" />
                   ),
+                  title: { key: "admin.events.new" } as TranslationDescriptor,
                 },
               };
             },
@@ -195,6 +203,7 @@ const router = createBrowserRouter([
                 action: module.action,
                 handle: {
                   breadcrumb: (match: UIMatch<AdminEvent>) => AdminEventBreadcrumb(match),
+                  title: (match: UIMatch<AdminEvent>, t) => t('admin.events.edit') + t('colon') + match.loaderData?.name,
                 } as BreadcrumbHandle<AdminEvent>,
               };
             },

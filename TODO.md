@@ -1,4 +1,5 @@
 # TODO
+19. Add events/import route triggering Event::importEventsFromMainSite()
 17. Once all old offers without token_hash have expired, make token_hash non-nullable in DB,
     and remove code that works with null token_hash:
     - api: Offer::tokenIsValid(), testLegacyOffersWithoutTokenCanBeUpdated()
@@ -24,3 +25,4 @@
 06. Translations (EN, FR)
 07. Add Admin pages
 14. Add notification snack bar (flash toasts)
+18. Fix console complaint about missing fallbackElement

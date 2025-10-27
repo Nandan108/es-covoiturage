@@ -70,7 +70,7 @@ function AdminEventForm({
     <Form method={method} action={formAction} encType="multipart/form-data" className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-slate-900">{headline}</h1>
-        <p className="text-sm text-slate-500">{t("admin.events.form.subtitle")}</p>
+        {/* <p className="text-sm text-slate-500">{t("admin.events.form.subtitle")}</p> */}
       </div>
       <div className="grid gap-6 md:grid-cols-2">
         <label className="text-sm font-medium text-slate-600">

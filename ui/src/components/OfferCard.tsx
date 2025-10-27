@@ -59,7 +59,7 @@ function OfferCard({ offer: o }: { offer: Offer }) {
         ) : (
           ""
         )}
-        <div>{o.address}</div>
+        <div><b>{t("offerCard.place")}:</b> {o.address}</div>
         {o.email_is_public ? (
           <div>
             <b>{t("offerCard.email")}:</b> {o.email}

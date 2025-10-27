@@ -29,7 +29,7 @@ export default function EventsList({ events }: { events: EventSummary[] }) {
     <div className="w-full m-auto">
       {evtByYear.map(({ year, events }) => (
         <div key={year}>
-          <h2 className="text-2xl mb-4 bg-opacity-50 rounded-xl shadow-lg font-bold text-slate-500 bg-slate-100 p-2 text-center">
+          <h2 className="text-2xl mb-4 rounded-xl shadow-sm font-bold text-slate-500 bg-slate-100/50 p-1 text-center shadow-black/20">
             {year}
           </h2>
           <ul className="grid grid-cols-1 min-[500px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-6">

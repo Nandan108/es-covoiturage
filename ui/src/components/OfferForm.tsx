@@ -88,7 +88,7 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
         </div>
 
         <div className="form-group">
-          <label htmlFor="address" id="address_label">
+          <label htmlFor="address" id="address_label" className="block text-sm mb-1">
             {t("offerForm.labels.location")}
           </label>
           <LocationSearch
