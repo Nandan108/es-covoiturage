@@ -50,20 +50,24 @@ afterAll(() => {
   globalThis.ResizeObserver = originalResizeObserver;
 });
 
+// Stub Leaflet utilities so OfferForm can create lat/lng objects without loading the real library.
 vi.mock("leaflet", () => {
   const latLng = (lat: number, lng: number) => ({ lat, lng });
   return { __esModule: true, default: { latLng }, latLng };
 });
 
+// Replace the full EventCard layout with a minimal div that tests assert against via data-testid.
 vi.mock("@/components/EventCard", () => ({
   __esModule: true,
   default: ({ e }: { e: EventDetail }) => <div data-testid="event-card">{e.name}</div>,
 }));
 
+// Legend renders SVG/icon assets; here we just expose a sentinel element so layout assertions keep working.
 vi.mock("@/components/map/Legend", () => ({
   Legend: () => <div data-testid="legend" />,
 }));
 
+// Swap the autocomplete widget for a button that immediately calls onSelectLocation, letting the test control the map.
 vi.mock("@/components/locationSearch", () => ({
   __esModule: true,
   default: ({ onSelectLocation }: { onSelectLocation: (lat: number, lng: number) => void }) => (
@@ -77,6 +81,12 @@ vi.mock("@/components/locationSearch", () => ({
   ),
 }));
 
+// Tests hit a lazy-loaded <EventMap /> wrapped in Suspense. The lazy boundary resolves on
+// a microtask, so without this helper we'd see the usual "wrap updates in act" warning.
+// Flushing one microtask inside act() lets assertions observe the ready tree without noise.
+const flushSuspense = () => act(async () => { await Promise.resolve(); });
+
+// Intercept the lazy EventMap component so we can capture its props/ref and avoid loading Leaflet in tests.
 vi.mock("@/components/map/EventMap", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { forwardRef, useImperativeHandle } = require("react") as typeof import("react");
@@ -92,6 +102,7 @@ vi.mock("@/components/map/EventMap", () => {
   return { __esModule: true, default: MockEventMap };
 });
 
+// Mock react-router hooks/components that OfferForm consumes so tests can drive navigation/fetcher state.
 vi.mock("react-router", () => {
   return {
     Form: ({ children, ...props }: { children: ReactNode }) => <form {...props}>{children}</form>,
@@ -133,21 +144,23 @@ describe("OfferForm", () => {
     mapState.reset();
   });
 
-  it("marks essential fields as required", () => {
+  it("marks essential fields as required", async () => {
     render(<OfferForm event={makeEvent()} />);
+    await flushSuspense();
 
     expect(screen.getByLabelText("Nom")).toBeRequired();
     expect(screen.getByLabelText("Email")).toBeRequired();
   });
 
-  it("updates lat/lng inputs when a map location is selected", () => {
+  it("updates lat/lng inputs when a map location is selected", async () => {
     render(<OfferForm event={makeEvent()} />);
+    await flushSuspense();
 
     const props = mapState.latestProps;
     expect(props).toBeTruthy();
 
     const fakePoint = { lat: 46.1, lng: 3.2 };
-    act(() => {
+    await act(async () => {
       props?.setLocation?.(fakePoint);
     });
 
@@ -157,9 +170,10 @@ describe("OfferForm", () => {
     expect(lngInput.value).toBe(fakePoint.lng.toString());
   });
 
-  it("shows submission progress based on navigation state", () => {
+  it("shows submission progress based on navigation state", async () => {
     navigationState.state = "submitting";
     render(<OfferForm event={makeEvent()} />);
+    await flushSuspense();
 
     const submitButton = screen.getByRole("button", { name: "Création…" });
     expect(submitButton).toBeDisabled();

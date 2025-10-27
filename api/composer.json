@@ -64,7 +64,8 @@
             "@php artisan config:clear --ansi",
             "@php artisan test"
         ],
-        "cs-fix": "./vendor/bin/php-cs-fixer fix --allow-risky=yes --diff"
+        "cs-fix": "./vendor/bin/php-cs-fixer fix --allow-risky=yes --diff",
+        "testAndCover": "./vendor/bin/phpunit --coverage-text --coverage-html coverage && open coverage/dashboard.html"
     },
     "extra": {
         "laravel": {

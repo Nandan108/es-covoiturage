@@ -1,14 +1,16 @@
 import { Form, useFetcher, useNavigation } from "react-router";
 import type { Offer, EventDetail } from "@/types/types";
 import OfferRoles from "./OfferRoles";
-import EventMap, { type MapActions } from "./map/EventMap";
-import { useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useRef, useState } from "react";
 import Leaflet from "leaflet";
 import LocationSearch from "./locationSearch";
 import { Legend } from "./map/Legend";
 import EventCard from "./EventCard";
 import { FaTrash } from "react-icons/fa";
 import { useI18n } from "@/i18n/I18nProvider";
+import type { MapActions } from "./map/EventMap";
+
+const EventMap = lazy(() => import("./map/EventMap"));
 
 export default function OfferForm({ event, offer }: { event: EventDetail; offer?: Offer }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -18,7 +20,10 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
   );
 
   const editing = offer != null;
-  const mapRef = useRef<MapActions>(null);
+  const mapRef = useRef<MapActions | null>(null);
+  const setMapRef = useCallback((instance: MapActions | null) => {
+    mapRef.current = instance;
+  }, []);
   const locationSearchRef = useRef<HTMLInputElement>(null);
 
   const fetcher = useFetcher();
@@ -134,16 +139,18 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
         </div>
         <Legend mode="edit" />
 
-        <EventMap
-          ref={mapRef}
-          event={event}
-          // onBoundsChange={setBounds}
-          initialPosition={latLng}
-          setLocation={(latLng) => {
-            setLatLng(latLng);
-          }}
-          className="mb-4 h-96 w-full overflow-hidden bg-black/30"
-        />
+        <Suspense fallback={<div className="mb-4 h-96 w-full bg-black/30" />}>
+          <EventMap
+            ref={setMapRef}
+            event={event}
+            // onBoundsChange={setBounds}
+            initialPosition={latLng}
+            setLocation={(latLng) => {
+              setLatLng(latLng);
+            }}
+            className="mb-4 h-96 w-full overflow-hidden bg-black/30"
+          />
+        </Suspense>
 
         <label className="block">
           <span className="block text-sm mb-1">{t("offerForm.labels.notes")}</span>

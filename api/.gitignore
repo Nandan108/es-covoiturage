@@ -30,3 +30,4 @@ Thumbs.db
 # Prod needs these because writing to /home/clients/.../.config/psysh is not allowed
 /.psysh.php
 /storage/psysh/
+/coverage/*

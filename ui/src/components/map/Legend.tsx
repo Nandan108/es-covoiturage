@@ -1,4 +1,4 @@
-import { greenMan, lightblueCar, redCar, eventMarker } from "./markerIcons";
+import { greenMan, lightblueCar, redCar, eventMarker } from "./markerAssets";
 // get standard leaflet marker icons
 import marker from "leaflet/dist/images/marker-icon.png";
 import { useI18n } from "@/i18n/I18nProvider";

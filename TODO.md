@@ -26,3 +26,4 @@
 07. Add Admin pages
 14. Add notification snack bar (flash toasts)
 18. Fix console complaint about missing fallbackElement
+20. Perf: split map bundle and optimise hydration

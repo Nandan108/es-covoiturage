@@ -2,7 +2,7 @@
 import { useMatches, type UIMatch } from "react-router";
 import { Fragment } from "react";
 import type { BreadcrumbHandle } from "@/types/router";
-import { lightblueCar } from "../map/markerIcons";
+import { lightblueCar } from "../map/markerAssets";
 
 export default function Breadcrumbs() {
   const matches = useMatches() as UIMatch<unknown, BreadcrumbHandle>[];
