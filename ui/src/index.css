@@ -30,9 +30,13 @@ body {
             shadow-lg hover:shadow-none transition-shadow;
   }
 
+  .admin-input {
+    @apply w-full rounded-lg border border-slate-300 font-medium text-slate-600 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none;
+  }
+
   .input {
     @apply block w-full px-4 py-2 m-0 text-base font-normal bg-clip-padding rounded-lg border border-solid shadow-md shadow-gray-300;
-    @apply text-gray-700 bg-gray-100/70 border-gray-300;
+    @apply text-gray-700 bg-gray-100/70 border-gray-300 placeholder-shown:text-gray-400;
     @apply focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none;
     @apply transition ease-in-out;
     /* display: block;

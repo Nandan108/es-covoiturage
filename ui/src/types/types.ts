@@ -1,4 +1,7 @@
 // ui/src/types.ts
+
+export type Optionalize<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+
 export type EventType = "retreat" | "seminar" | "silent-retreat";
 
 export type ISODate = string; // 'YYYY-MM-DD'

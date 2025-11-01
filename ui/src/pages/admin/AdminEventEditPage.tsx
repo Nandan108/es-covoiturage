@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { redirect, useFetcher, useLoaderData } from "react-router";
+import { redirect, useLoaderData } from "react-router";
 import { adminApi } from "@/admin/api";
 import type { AdminEvent, AdminEventFormValues } from "@/admin/types";
 import AdminEventForm from "./AdminEventForm";
@@ -18,8 +18,6 @@ export function Component() {
   const [initialValues, setInitialValues] = useState<AdminEventFormValues>(() =>
     buildFormValues(event)
   );
-  const deleteFetcher = useFetcher();
-  const isDeleting = deleteFetcher.state === "submitting";
 
   useEffect(() => {
     setInitialValues(buildFormValues(event));
@@ -28,22 +26,12 @@ export function Component() {
   return (
     <div className="space-y-6">
       <AdminEventForm
+        method='put'
         initialValues={initialValues}
         submitLabel={t("admin.events.form.update")}
         submittingLabel={t("admin.events.form.updating")}
-        headline={t("admin.events.form.editTitle", { name: event.name })}
+        headline={event.name}
       />
-      <div className="flex justify-end">
-        <deleteFetcher.Form method="delete">
-          <button
-            type="submit"
-            className="rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-50"
-            disabled={isDeleting}
-          >
-            {isDeleting ? t("admin.events.deleting") : t("admin.events.delete")}
-          </button>
-        </deleteFetcher.Form>
-      </div>
     </div>
   );
 }
@@ -87,6 +75,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   const formData = await request.formData();
   const values = formDataToEventValues(formData);
+
   const sub = store.dispatch(adminApi.endpoints.updateEvent.initiate({ hashId, values }));
   await runMutation(sub, "Impossible de mettre à jour l'événement", 422);
   return redirect(appendNotice("/admin/events", "admin_event_updated"));

@@ -62,8 +62,8 @@ async function updateOffer(eventHash: string, offerId: number, formData: FormDat
     email_is_public: entries.email_is_public === "true",
     driver_seats: Number(entries.driver_seats),
     pasngr_seats: Number(entries.pasngr_seats),
-    notes: String(entries.notes || null),
-    phone: String(entries.phone || null),
+    notes: entries.notes ? String(entries.notes) : null,
+    phone: entries.phone ? String(entries.phone) : null,
   };
 
   const sub = store.dispatch(api.endpoints.updateOffer.initiate({ offerId, eventHash, patch }));

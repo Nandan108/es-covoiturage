@@ -55,17 +55,19 @@ export function Component() {
                   }`}
                 >
                   <td className="px-4 py-3">
-                    {event.image_url ? (
-                      <img
-                        src={getImageUrl(event.image_url)}
-                        alt={event.name}
-                        className="h-16 w-24 rounded-lg object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-16 w-24 items-center justify-center rounded-lg bg-slate-200 text-xs text-slate-500">
-                        {t("admin.events.noImage")}
-                      </div>
-                    )}
+                    <Link to={`/admin/events/${event.hashId}/edit`}>
+                      {event.image_url ? (
+                        <img
+                          src={getImageUrl(event.image_url)}
+                          alt={event.name}
+                          className="h-16 w-24 rounded-lg object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-16 w-24 items-center justify-center rounded-lg bg-slate-200 text-xs text-slate-500">
+                          {t("admin.events.noImage")}
+                        </div>
+                      )}
+                    </Link>
                   </td>
                   <td className="px-4 py-3 font-medium text-slate-900">
                     <div className="flex flex-col">

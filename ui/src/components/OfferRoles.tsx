@@ -43,7 +43,7 @@ function reducer(s: State, act: Act): State {
   }
 }
 
-export default function OfferRoles() {
+export default function OfferRoles({ onRoleChange }: { onRoleChange?: (pssgnr: number, driver: number) => void }) {
   const [state, dispatch] = useReducer(reducer, { pssgnr: 1, driver: 0 });
   const { pssgnr, driver } = state;
   const { t } = useI18n();
@@ -57,7 +57,8 @@ export default function OfferRoles() {
     if (prev.current.pssgnr === 0 && pssgnr > 0) passengerRef.current?.focus();
     if (prev.current.driver === 0 && driver > 0) driverRef.current?.focus();
     prev.current = state;
-  }, [state, pssgnr, driver]);
+    onRoleChange?.(pssgnr, driver);
+  }, [state, pssgnr, driver, onRoleChange]);
 
   const passengerChecked = pssgnr > 0;
   const driverChecked = driver > 0;

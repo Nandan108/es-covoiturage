@@ -1,7 +1,7 @@
 import { Form, useFetcher, useNavigation } from "react-router";
 import type { Offer, EventDetail } from "@/types/types";
 import OfferRoles from "./OfferRoles";
-import { lazy, Suspense, useCallback, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useMemo, useRef, useState } from "react";
 import Leaflet from "leaflet";
 import LocationSearch from "./locationSearch";
 import { Legend } from "./map/Legend";
@@ -9,6 +9,7 @@ import EventCard from "./EventCard";
 import { FaTrash } from "react-icons/fa";
 import { useI18n } from "@/i18n/I18nProvider";
 import type { MapActions } from "./map/EventMap";
+import CoordinatesInput from "./CoordinatesInput";
 
 const EventMap = lazy(() => import("./map/EventMap"));
 
@@ -30,19 +31,20 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
   const navigation = useNavigation();
   const { t } = useI18n();
 
-  const form = {
+  const [form, setForm] = useState({
+    id: offer?.id,
     eventHash: event.hashId,
     name: offer?.name ?? "",
     address: offer?.address ?? "",
-    lat: offer?.lat ?? null,
-    lng: offer?.lng ?? null,
+    lat: offer?.lat,
+    lng: offer?.lng,
     notes: offer?.notes ?? "",
     phone: offer?.phone ?? "",
     email: offer?.email ?? "",
     email_is_public: offer?.email_is_public ?? true,
     driver_seats: offer?.driver_seats ?? 0,
     pasngr_seats: offer?.pasngr_seats ?? 0,
-  };
+  });
 
   const handleSelectLocation = (lat: number, lng: number) => {
     // move marker to selected location
@@ -55,6 +57,18 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
   const isSubmitting = navigation.state === "submitting";
   const isDeleting = fetcher.state === "submitting";
 
+  // update form state when roles change
+
+  const handleRoleChange = useMemo(() => {
+    return (pssgnr: number, driver: number) => {
+      setForm((prev) => ({
+        ...prev,
+        pasngr_seats: pssgnr,
+        driver_seats: driver,
+      }));
+    };
+  }, [setForm]);
+
   return (
     <div className="mx-auto p-4">
       <EventCard e={event} className="mb-6" />
@@ -66,7 +80,7 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
         <input type="hidden" name="eventHash" defaultValue={form.eventHash} />
         <input type="hidden" name="id" defaultValue={offer?.id} />
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="flex flex-col sm:grid gap-4 sm:grid-cols-2">
           <label className="block">
             <span className="block text-sm mb-1">{t("offerForm.labels.name")}</span>
             <input className="input" name="name" defaultValue={form.name} required />
@@ -82,72 +96,70 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
             <input className="input" name="phone" type="tel" defaultValue={form.phone} />
           </label>
 
-          <OfferRoles />
+          <OfferRoles onRoleChange={handleRoleChange} />
 
-          <label className="block">
+          <label className="block col-span-2">
             <div className="block text-sm mb-1">
-              {t("offerForm.labels.location")} <i className="text-gray-500 text-xs">{t("offerForm.labels.locationHint")}</i>
+              {t("offerForm.labels.location")}{" "}
+              <i className="text-gray-500 text-xs">{t("offerForm.labels.locationHint")}</i>
             </div>
-            <input ref={addressRef} className="input" name="address" defaultValue={form.address} required/>
+            <input
+              ref={addressRef}
+              className="input"
+              name="address"
+              defaultValue={form.address}
+              required
+            />
           </label>
-        </div>
 
-        <div className="form-group">
-          <label htmlFor="address" id="address_label" className="block text-sm mb-1">
-            {t("offerForm.labels.location")}
+          <label
+            htmlFor="offer-form-location-search"
+            id="address_label"
+            className="block text-sm mb-1"
+          >
+            <span>{t("locationSearch.label")}</span>
+            <LocationSearch
+              id="offer-form-location-search"
+              searchQuery={searchQuery}
+              onSearchQueryChange={setSearchQuery}
+              onFocus={() => setSearchQuery((prev) => prev || addressRef.current?.value || "")}
+              onBlur={() => setSearchQuery("")}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t("locationSearch.placeholder")}
+              aria-labelledby="address_label"
+              ref={locationSearchRef}
+              className="input text-sm"
+              onSelectLocation={(lat, lng) => {
+                handleSelectLocation(lat, lng);
+                mapRef.current?.centerOn(Leaflet.latLng(lat, lng));
+                setSearchQuery("");
+                locationSearchRef.current?.blur();
+              }}
+            />
           </label>
-          <LocationSearch
-            searchQuery={searchQuery}
-            onSearchQueryChange={setSearchQuery}
-            onFocus={() => setSearchQuery(searchQuery || (addressRef.current?.value ?? ""))}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t("locationSearch.placeholder")}
-            aria-labelledby="address_label"
-            ref={locationSearchRef}
-            onSelectLocation={handleSelectLocation}
+
+          <CoordinatesInput
+            setLatLng={setLatLng}
+            latLng={latLng}
+            inputId="offer-coordinates"
+            latFieldName="lat"
+            lngFieldName="lng"
+            inputClassName="input"
+            labelClassName="col-span-2"
           />
         </div>
 
-        <div className="form-group mt-2 mb-1 text-slate-500">
-          <div className="flex flex-col sm:flex-row sm:items-center">
-            <span className="mr-4">{t("offerForm.labels.coordinates")}: </span>
-            <div className="flex items-center mt-2 sm:mt-0">
-              <span>
-                {t("offerForm.labels.lat")}:
-                <input
-                  type="text"
-                  name="lat"
-                  id="lat"
-                  value={latLng?.lat ?? form.lat ?? ""}
-                  className="py-0 px-1 w-20 mx-2 bg-neutral-300 border border-neutral-400"
-                  readOnly
-                />
-              </span>
-              <span>
-                {t("offerForm.labels.lng")}:
-                <input
-                  type="text"
-                  name="lng"
-                  id="lng"
-                  value={latLng?.lng ?? form.lng ?? ""}
-                  className="py-0 px-1 w-20 mx-2 bg-neutral-300 border border-neutral-400"
-                  readOnly
-                />
-              </span>
-            </div>
-          </div>
-        </div>
         <Legend mode="edit" />
 
         <Suspense fallback={<div className="mb-4 h-96 w-full bg-black/30" />}>
           <EventMap
+            mode="offerLocSelect"
+            editingOffer={form}
             ref={setMapRef}
             event={event}
             // onBoundsChange={setBounds}
             initialPosition={latLng}
-            setLocation={(latLng) => {
-              setLatLng(latLng);
-            }}
+            setLocation={setLatLng}
             className="mb-4 h-96 w-full overflow-hidden bg-black/30"
           />
         </Suspense>
@@ -176,8 +188,8 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
                 ? t("offerForm.buttons.saving")
                 : t("offerForm.buttons.save")
               : isSubmitting
-                ? t("offerForm.buttons.creating")
-                : t("offerForm.buttons.create")}
+              ? t("offerForm.buttons.creating")
+              : t("offerForm.buttons.create")}
           </button>
           {editing && (
             <button

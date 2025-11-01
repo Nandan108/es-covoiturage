@@ -62,19 +62,21 @@ function AdminLayout() {
     <div className="flex min-h-screen flex-col bg-slate-200">
       <header className="bg-slate-900 px-6 py-4 text-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <div>
-            <p className="text-sm uppercase tracking-wide text-slate-300">{t("admin.title")}</p>
-            <p className="text-2xl font-semibold">{admin.name}</p>
-            <p className="text-sm text-slate-300">{admin.email}</p>
+          <p className="text-sm uppercase tracking-wide text-slate-300">{t("admin.title")}</p>
+          <div className="flex gap-2 items-end">
+            <div className="mr-4 flex flex-col items-start text-right">
+              <p className="text-xl font-semibold">{admin.name}</p>
+              <p className="text-sm text-slate-300">{admin.email}</p>
+            </div>
+            <button
+              type="button"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="rounded-md bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/20 disabled:opacity-50"
+            >
+              {isLoggingOut ? t("admin.loggingOut") : t("admin.logout")}
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={handleLogout}
-            disabled={isLoggingOut}
-            className="rounded-md bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/20 disabled:opacity-50"
-          >
-            {isLoggingOut ? t("admin.loggingOut") : t("admin.logout")}
-          </button>
         </div>
       </header>
       <div className="bg-slate-200/60">

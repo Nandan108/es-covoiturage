@@ -44,37 +44,40 @@ export default function AutocompleteInput<T>({
     setHighlighted(-1);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!open || options.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlighted((prev) => (prev + 1) % options.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlighted((prev) => (prev - 1 + options.length) % options.length);
+    } else if (e.key === "Enter" && highlighted >= 0) {
+      e.preventDefault();
+      handleSelect(options[highlighted]);
+    } else if (e.key === "Escape") {
+      handleOpenChange?.(false);
+      setHighlighted(-1);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleChange(e);
+    handleOpenChange?.(true);
+    setHighlighted(-1);
+  }
+
+  const inputClass = isLoading && loadingClassName ? loadingClassName : props.className || "";
+
   return (
     <div className="relative">
       <input
         ref={ref}
         type="text"
-        onChange={(e) => {
-          handleChange(e);
-          handleOpenChange?.(true);
-          setHighlighted(-1);
-        }}
-        onKeyDown={(e) => {
-          if (!open || options.length === 0) return;
-
-          if (e.key === "ArrowDown") {
-            e.preventDefault();
-            setHighlighted((prev) => (prev + 1) % options.length);
-          } else if (e.key === "ArrowUp") {
-            e.preventDefault();
-            setHighlighted((prev) => (prev - 1 + options.length) % options.length);
-          } else if (e.key === "Enter" && highlighted >= 0) {
-            e.preventDefault();
-            handleSelect(options[highlighted]);
-          } else if (e.key === "Escape") {
-            handleOpenChange?.(false);
-            setHighlighted(-1);
-          }
-        }}
-        className={
-          "input border rounded p-2 w-full " +
-          (isLoading && loadingClassName ? loadingClassName : "")
-        }
+        onChange={handleInputChange}
+        onKeyDown={handleKeyDown}
+        className={`input ${inputClass}`}
         {...props}
       />
 

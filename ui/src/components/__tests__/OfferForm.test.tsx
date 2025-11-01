@@ -164,10 +164,16 @@ describe("OfferForm", () => {
       props?.setLocation?.(fakePoint);
     });
 
-    const latInput = document.getElementById("lat") as HTMLInputElement;
-    const lngInput = document.getElementById("lng") as HTMLInputElement;
+    const latInput = document.querySelector('input[name="lat"]') as HTMLInputElement | null;
+    const lngInput = document.querySelector('input[name="lng"]') as HTMLInputElement | null;
+    if (!latInput || !lngInput) {
+      throw new Error("Expected hidden latitude/longitude inputs to exist");
+    }
     expect(latInput.value).toBe(fakePoint.lat.toString());
     expect(lngInput.value).toBe(fakePoint.lng.toString());
+
+    const coordsField = document.getElementById("offer-coordinates") as HTMLInputElement | null;
+    expect(coordsField?.value).toBe("46.1, 3.2");
   });
 
   it("shows submission progress based on navigation state", async () => {

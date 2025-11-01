@@ -8,6 +8,7 @@ import BoundsWatcher from "./BoundsWatcher";
 import { iconForOffer, icons } from "./markerIcons";
 import type { Offer } from "@/types/types";
 import { useI18n } from "@/i18n/I18nProvider";
+import type { Optionalize } from "@/types/types";
 
 export type MapActions = {
   focusOffer: (
@@ -18,6 +19,8 @@ export type MapActions = {
   centerOn: (latLng: L.LatLng) => void;
 };
 
+type MapMode = "view" | "offerLocSelect" | "eventLocSelect";
+
 type Props = {
   event: { loc_lat: number; loc_lng: number; loc_name: string; hashId: string; offers: Offer[] };
   initialPosition: L.LatLng | null;
@@ -25,13 +28,33 @@ type Props = {
   zoom?: number;
   className?: string;
   setLocation?: (latLng: L.LatLng) => void; // if set, allow user to pick location
+  mode?: MapMode;
+  editingOffer?: Optionalize<Offer, "id" | 'lat' | 'lng' | "created_at" | "updated_at" | "token_hash" | "token_expires_at">;
 };
 
+function getRoleNameKey(o: { pasngr_seats: number; driver_seats: number }) {
+    return o.pasngr_seats && o.driver_seats
+      ? "legend.both"
+      : o.pasngr_seats
+      ? "legend.passenger"
+      : "legend.driver";
+}
+
 const EventMap = forwardRef<MapActions, Props>(function (
-  { event, onBoundsChange, zoom = 13, className = "h-96 w-full", setLocation, initialPosition },
+  {
+    event,
+    onBoundsChange,
+    zoom = 13,
+    className = "h-96 w-full",
+    setLocation,
+    initialPosition,
+    mode = "view",
+    editingOffer,
+  },
   ref
 ) {
   const { t } = useI18n();
+
   // Marker registry
   const markersRef = useRef(new Map<number, L.Marker>());
   const centerLL = useMemo(
@@ -91,7 +114,7 @@ const EventMap = forwardRef<MapActions, Props>(function (
           // Build bounds that include event center + chosen offer, then pad ~10%
           const bounds = Leaflet.latLngBounds(centerLL, offerLL).pad(paddingRatio);
 
-          // Fit to those bounds; cap zoom so we don’t over-zoom on very close points
+          // Fit to those bounds; cap zoom so we don't over-zoom on very close points
           if (opts?.openPopup !== false) {
             m.openPopup();
           }
@@ -118,10 +141,12 @@ const EventMap = forwardRef<MapActions, Props>(function (
 
   function LocationMarker({
     initialPosition,
-    popupContent = t("legend.origin"),
+    popupContent,
+    icon,
   }: {
     initialPosition?: L.LatLng | null;
     popupContent?: React.ReactNode;
+    icon?: L.Icon;
   }) {
     const [position, setPosition] = useState<L.LatLng | null>(initialPosition || null);
     useMapEvents({
@@ -133,12 +158,42 @@ const EventMap = forwardRef<MapActions, Props>(function (
 
     if (position) {
       return (
-        <Marker position={position} icon={icons.default}>
+        <Marker position={position} icon={icon || icons.default}>
           <Popup>{popupContent}</Popup>
         </Marker>
       );
     }
   }
+
+  // Get the appropriate icon and popup content based on mode
+  const getLocationMarkerProps = () => {
+    switch (mode) {
+      case "offerLocSelect": {
+        const offerIcon = editingOffer ? iconForOffer(editingOffer) : icons.default;
+        const role = editingOffer
+          ? t(getRoleNameKey(editingOffer))
+          : t("legend.origin");
+        return {
+          icon: offerIcon,
+          popupContent:
+            t("legend.origin", { role }) || `${t("legend.origin")} (${role})`,
+        };
+      }
+      case "eventLocSelect":
+        return {
+          icon: icons.event,
+          popupContent: t("legend.event") || "Event location",
+        };
+
+      default: // "view"
+        return {
+          icon: icons.default,
+          popupContent: t("legend.origin"),
+        };
+    }
+  };
+
+  const locationMarkerProps = getLocationMarkerProps();
 
   return (
     <MapContainer
@@ -155,37 +210,53 @@ const EventMap = forwardRef<MapActions, Props>(function (
       <MapApi />
       {onBoundsChange && <BoundsWatcher onBoundsChange={onBoundsChange} debounceMs={200} />}
 
-      {/* Event location */}
-      <Marker position={eventMarker} icon={icons.event}>
-        <Popup>Lieu de la rencontre<hr /> {event.loc_name}</Popup>
-      </Marker>
+      {/* Event location - hide in eventLocSelect mode to avoid confusion */}
+      {mode !== "eventLocSelect" && (
+        <Marker position={eventMarker} icon={icons.event}>
+          <Popup>
+            Lieu de la rencontre
+            <hr /> {event.loc_name}
+          </Popup>
+        </Marker>
+      )}
 
-      {/* Offer markers */}
-      {event.offers.map((o) => {
-        const role = t(o.pasngr_seats && o.driver_seats
-            ? "legend.both"
-            : o.pasngr_seats ? "legend.passenger" : "legend.driver");
-        return (
-          <Marker
-            key={o.id}
-            ref={registerMarker(o.id)}
-            position={[o.lat, o.lng]}
-            icon={iconForOffer(o)}
-          >
-            <Popup className="text-nowrap fit-content">
-              <b>{o.name}</b> ({role})<br />
-              {o.address}
-              <br />
-              {o.phone && (
-                <>
-                  <b>{t("offerCard.phone")}{t("colon")}</b> {o.phone}
-                </>
-              )}
-            </Popup>
-          </Marker>
-        );
-      })}
-      {setLocation && <LocationMarker initialPosition={initialPosition} />}
+      {/* Offer markers - hide the editing offer to avoid duplicate markers */}
+      {event.offers
+        .filter((offer) => mode !== "offerLocSelect" || offer.id !== editingOffer?.id)
+        .map((o) => {
+          return (
+            <Marker
+              key={o.id}
+              ref={registerMarker(o.id)}
+              position={[o.lat, o.lng]}
+              icon={iconForOffer(o)}
+            >
+              <Popup className="text-nowrap fit-content">
+                <b>{o.name}</b> ({t(getRoleNameKey(o))})<br />
+                {o.address}
+                <br />
+                {o.phone && (
+                  <>
+                    <b>
+                      {t("offerCard.phone")}
+                      {t("colon")}
+                    </b>{" "}
+                    {o.phone}
+                  </>
+                )}
+              </Popup>
+            </Marker>
+          );
+        })}
+
+      {/* Location picker marker - only show when setLocation is provided */}
+      {setLocation && (
+        <LocationMarker
+          initialPosition={initialPosition}
+          popupContent={locationMarkerProps.popupContent}
+          icon={locationMarkerProps.icon}
+        />
+      )}
     </MapContainer>
   );
 });

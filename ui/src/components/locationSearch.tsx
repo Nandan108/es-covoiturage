@@ -1,5 +1,5 @@
 // LocationSearch.tsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useAutocompleteQuery, type Loc } from "@/services/locationApi";
 import AutocompleteInput from "./AutocompleteInput";
@@ -9,6 +9,7 @@ type Props = {
   searchQuery: string;
   onSearchQueryChange: (q: string) => void;
   onSelectLocation: (lat: number, lng: number) => void;
+  className?: string;
 } & React.ComponentProps<"input">;
 
 function LocationSearch({
@@ -18,7 +19,6 @@ function LocationSearch({
   ref,
   ...props
 }: Props) {
-
 
   const [open, setOpen] = useState(false);
   const debounced = useDebounce(searchQuery, 500);
@@ -35,13 +35,18 @@ function LocationSearch({
     return `${road}, ${a.postcode ?? ""} ${a.city ?? ""}, ${a.country ?? ""}`;
   };
 
+  // effect to open the dropdown when results change
+  useEffect(() => {
+    setOpen(searchQuery > '' && results.length > 0);
+  }, [results, searchQuery]);
+
   return (
     <AutocompleteInput
       value={searchQuery}
       open={open}
       onBlur={() => setOpen(false)}
       onOpenChange={setOpen}
-      onChange={(e) => onSearchQueryChange(e.target.value)}
+      onChange={({ target: { value } }) => { onSearchQueryChange(value); }}
       ref={ref}
       options={results}
       renderOption={(loc) => formatAddress(loc)}
@@ -50,6 +55,7 @@ function LocationSearch({
         onSelectLocation(Number(loc.lat), Number(loc.lon));
       }}
       isLoading={isFetching}
+      className={props.className}
       loadingClassName="opacity-50 bg-neutral-200"
       loadingNode={<p className="text-sm absolute text-gray-500">{t("locationSearch.loading")}</p>}
       {...props}
