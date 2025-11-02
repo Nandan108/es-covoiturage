@@ -8,7 +8,7 @@ import {
   useState,
   type ChangeEvent,
 } from "react";
-import { Form, useFetcher, useNavigation } from "react-router";
+import { Form, useActionData, useFetcher, useNavigation } from "react-router";
 import type { AdminEventFormValues, AdminEventType } from "@/admin/types";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getImageUrl } from "@/store/api";
@@ -18,6 +18,7 @@ import Leaflet from "leaflet";
 import type L from "leaflet";
 import type { MapActions } from "@/components/map/EventMap";
 import CoordinatesInput from "@/components/CoordinatesInput";
+import { useNotifications } from "@/components/notifications/NotificationProvider";
 
 const EventMap = lazy(() => import("@/components/map/EventMap"));
 
@@ -59,6 +60,9 @@ function AdminEventForm({
   }, []);
 
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const actionData = useActionData<{ error?: string }>();
+  const deleteFetcher = useFetcher();
+  const { notify } = useNotifications();
 
   useEffect(() => {
     setValues(initialValues);
@@ -69,8 +73,20 @@ function AdminEventForm({
     );
   }, [initialValues]);
 
-  const deleteFetcher = useFetcher();
   const isDeleting = deleteFetcher.state === "submitting";
+
+  useEffect(() => {
+    if (actionData?.error) {
+      notify(t("error.network"), "error", { description: t("error.unableToUpdateEvent") });
+    }
+  }, [actionData, notify, t]);
+
+  useEffect(() => {
+    const error = (deleteFetcher.data as { error?: string } | undefined)?.error;
+    if (deleteFetcher.state === "idle" && error) {
+      notify(t("error.network"), "error", { description: t("error.unableToDeleteEvent") });
+    }
+  }, [deleteFetcher.data, deleteFetcher.state, notify, t]);
 
   const updateValue = (
     key: keyof AdminEventFormValues,
@@ -113,24 +129,22 @@ function AdminEventForm({
     updateValue("image", file);
   };
 
+  const updateLatLng = useCallback(
+    (point: L.LatLng) => {
+      setLatLng(point);
+      setValues((prev) => ({
+        ...prev,
+        loc_lat: point.lat,
+        loc_lng: point.lng,
+      }));
+    },
+    [setValues]
+  );
+
   const handleSelectLocation = (lat: number, lng: number) => {
     const point = Leaflet.latLng(lat, lng);
-    setLatLng(point);
-    setValues((prev) => ({
-      ...prev,
-      loc_lat: lat,
-      loc_lng: lng,
-    }));
+    updateLatLng(point);
     mapRef.current?.centerOn(point);
-  };
-
-  const handleMapLocation = (point: L.LatLng) => {
-    setLatLng(point);
-    setValues((prev) => ({
-      ...prev,
-      loc_lat: point.lat,
-      loc_lng: point.lng,
-    }));
   };
 
   const mapEvent = useMemo(
@@ -317,7 +331,8 @@ function AdminEventForm({
           </div>
 
           <CoordinatesInput
-            setLatLng={setLatLng}
+            label="admin.events.form.locCoordinates"
+            setLatLng={updateLatLng}
             latLng={latLng}
             labelClassName="col-span-4 sm:col-span-2 block text-sm font-medium text-slate-600"
             inputClassName="admin-input"
@@ -332,7 +347,7 @@ function AdminEventForm({
               event={mapEvent}
               initialPosition={latLng}
               className="h-96 w-full overflow-hidden rounded-2xl bg-black/10"
-              setLocation={handleMapLocation}
+              setLocation={updateLatLng}
             />
           </Suspense>
         </div>

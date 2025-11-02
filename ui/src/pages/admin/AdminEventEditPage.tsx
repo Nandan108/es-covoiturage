@@ -5,7 +5,7 @@ import { adminApi } from "@/admin/api";
 import type { AdminEvent, AdminEventFormValues } from "@/admin/types";
 import AdminEventForm from "./AdminEventForm";
 import { store } from "@/store/store";
-import { runMutation, runQuery } from "@/utils/runApi";
+import { MutationError, mutationErrorResponse, runMutation, runQuery } from "@/utils/runApi";
 import { formDataToEventValues } from "@/admin/formData";
 import { appendNotice } from "@/utils/url";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -67,16 +67,23 @@ export async function action({ request, params }: ActionFunctionArgs) {
     throw new Response("Événement introuvable", { status: 404 });
   }
 
-  if (request.method.toUpperCase() === "DELETE") {
-    const sub = store.dispatch(adminApi.endpoints.deleteEvent.initiate(hashId));
-    await runMutation(sub, "Impossible de supprimer l'événement", 500);
-    return redirect(appendNotice("/admin/events", "admin_event_deleted"));
+  try {
+    if (request.method.toUpperCase() === "DELETE") {
+      const sub = store.dispatch(adminApi.endpoints.deleteEvent.initiate(hashId));
+      await runMutation(sub, "Impossible de supprimer l'événement", 500);
+      return redirect(appendNotice("/admin/events", "admin_event_deleted"));
+    }
+
+    const formData = await request.formData();
+    const values = formDataToEventValues(formData);
+
+    const sub = store.dispatch(adminApi.endpoints.updateEvent.initiate({ hashId, values }));
+    await runMutation(sub, "Impossible de mettre à jour l'événement", 422);
+    return redirect(appendNotice("/admin/events", "admin_event_updated"));
+  } catch (error) {
+    if (error instanceof MutationError) {
+      return mutationErrorResponse(error);
+    }
+    throw error;
   }
-
-  const formData = await request.formData();
-  const values = formDataToEventValues(formData);
-
-  const sub = store.dispatch(adminApi.endpoints.updateEvent.initiate({ hashId, values }));
-  await runMutation(sub, "Impossible de mettre à jour l'événement", 422);
-  return redirect(appendNotice("/admin/events", "admin_event_updated"));
 }

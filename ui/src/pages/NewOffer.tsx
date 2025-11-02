@@ -7,6 +7,7 @@ import { api } from "@/store/api";
 import { runMutation, runQuery } from "@/utils";
 import { store } from "@/store/store";
 import { appendNotice } from "@/utils/url";
+import { MutationError, mutationErrorResponse } from "@/utils/runApi";
 
 export function Component() {
   const event = useRouteLoaderData("event-detail") as EventDetail;
@@ -47,7 +48,13 @@ export async function action({ params, request }: ActionFunctionArgs) {
     },
   }));
 
-  const { offer } = await runMutation(sub, "Unable to create offer", 500);
-
-  return redirect(appendNotice(`/events/${eventHash}/offers/${offer.id}`, "offer_created"));
+  try {
+    const { offer } = await runMutation(sub, "Unable to create offer", 500);
+    return redirect(appendNotice(`/events/${eventHash}/offers/${offer.id}`, "offer_created"));
+  } catch (error) {
+    if (error instanceof MutationError) {
+      return mutationErrorResponse(error);
+    }
+    throw error;
+  }
 }

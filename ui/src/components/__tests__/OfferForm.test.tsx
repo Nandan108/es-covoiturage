@@ -36,6 +36,8 @@ const mapState = vi.hoisted(() => {
   };
 });
 
+const actionState = vi.hoisted(() => ({ data: undefined as { error?: string } | undefined }));
+
 const originalResizeObserver = globalThis.ResizeObserver;
 
 beforeAll(() => {
@@ -111,6 +113,7 @@ vi.mock("react-router", () => {
       Form: ({ children, ...props }: { children: ReactNode }) => <form {...props}>{children}</form>,
     }),
     useNavigation: () => ({ state: navigationState.state }),
+    useActionData: () => actionState.data,
     Link: ({ children, to }: { children: ReactNode; to: string }) => (
       <a href={typeof to === "string" ? to : "#"}>{children}</a>
     ),

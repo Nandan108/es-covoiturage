@@ -7,12 +7,13 @@ type NotificationType = "success" | "error";
 type Notification = {
   id: number;
   message: string;
+  description?: string;
   type: NotificationType;
   isVisible: boolean;
 };
 
 type NotificationContextValue = {
-  notify: (message: string, type?: NotificationType) => void;
+  notify: (message: string, type?: NotificationType, opts?: { description?: string }) => void;
 };
 
 const NotificationContext = createContext<NotificationContextValue>({
@@ -20,6 +21,9 @@ const NotificationContext = createContext<NotificationContextValue>({
 });
 
 export const useNotifications = () => useContext(NotificationContext);
+
+// notification timeout is 4 seconds in prod, 15 sec in dev
+const NOTIFICATION_TIMEOUT = import.meta.env.DEV ? 15000 : 4000;
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<Notification[]>([]);
@@ -44,9 +48,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   );
 
   const notify = useCallback(
-    (message: string, type: NotificationType = "success") => {
+    (message: string, type: NotificationType = "success", opts?: { description?: string }) => {
       const id = ++counter.current;
-      setItems((prev) => [...prev, { id, message, type, isVisible: false }]);
+      setItems((prev) => [...prev, { id, message, description: opts?.description, type, isVisible: false }]);
       // The double requestAnimationFrame ensures the toast renders once in
       // its hidden state before animating to visible
       requestAnimationFrame(() => {
@@ -56,7 +60,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           );
         });
       });
-      timers.current[id] = setTimeout(() => beginHide(id), 4000);
+      timers.current[id] = setTimeout(() => beginHide(id), NOTIFICATION_TIMEOUT);
     },
     [beginHide],
   );
@@ -66,15 +70,20 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   return (
     <NotificationContext.Provider value={value}>
       {children}
-      <div className="pointer-events-none fixed top-4 left-1/2 z-50 flex w-full max-w-lg -translate-x-1/2 flex-col items-center gap-3 px-4">
+      <div className="pointer-events-none fixed top-6 left-1/2 z-50 flex w-full max-w-lg -translate-x-1/2 flex-col items-center gap-3 px-4 py-2">
         {items.map((item) => (
           <div
             key={item.id}
             className={`pointer-events-auto flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-bold text-white shadow-lg transition-all duration-300
-              ${item.type === "error" ? "bg-red-600/80" : "bg-emerald-600/80"}
+              ${item.type === "error" ? "bg-red-400/80" : "bg-emerald-600/80"}
               ${item.isVisible ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0"}`}
           >
-            <span>{item.message}</span>
+            <div className="flex flex-col gap-1">
+              <span>{item.message}</span>
+              {item.description && (
+                <span className="text-xs font-bold text-white/90">{item.description}</span>
+              )}
+            </div>
             <button
               type="button"
               className="ml-3 text-white/70 hover:text-white"

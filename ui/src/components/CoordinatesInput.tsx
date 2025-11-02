@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import * as Leaflet from "leaflet";
-import { useI18n } from "@/i18n/I18nProvider";
 
 const precision = Math.pow(10, 4);
 const formatCoords = (lat: number, lng: number) => {
@@ -33,6 +32,7 @@ type Props = {
   inputId?: string;
   latFieldName?: string;
   lngFieldName?: string;
+  label: string;
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "onFocus" | "onBlur" | "defaultValue">;
 
 export default function CoordinatesInput({
@@ -44,9 +44,9 @@ export default function CoordinatesInput({
   inputId = "coordinates-input",
   latFieldName = "loc_lat",
   lngFieldName = "loc_lng",
+  label,
   ...props
 }: Props) {
-  const { t } = useI18n();
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -83,7 +83,7 @@ export default function CoordinatesInput({
       className={combinedLabelClassName}
       htmlFor={inputId}
     >
-      {t("admin.events.form.locCoordinates")}
+      {label}
       <input
         ref={inputRef}
         id={inputId}

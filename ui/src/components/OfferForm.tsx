@@ -1,7 +1,7 @@
-import { Form, useFetcher, useNavigation } from "react-router";
+import { Form, useActionData, useFetcher, useNavigation } from "react-router";
 import type { Offer, EventDetail } from "@/types/types";
 import OfferRoles from "./OfferRoles";
-import { lazy, Suspense, useCallback, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Leaflet from "leaflet";
 import LocationSearch from "./locationSearch";
 import { Legend } from "./map/Legend";
@@ -10,6 +10,7 @@ import { FaTrash } from "react-icons/fa";
 import { useI18n } from "@/i18n/I18nProvider";
 import type { MapActions } from "./map/EventMap";
 import CoordinatesInput from "./CoordinatesInput";
+import { useNotifications } from "@/components/notifications/NotificationProvider";
 
 const EventMap = lazy(() => import("./map/EventMap"));
 
@@ -30,6 +31,8 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
   const fetcher = useFetcher();
   const navigation = useNavigation();
   const { t } = useI18n();
+  const { notify } = useNotifications();
+  const actionData = useActionData<{ error?: string }>();
 
   const [form, setForm] = useState({
     id: offer?.id,
@@ -46,12 +49,22 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
     pasngr_seats: offer?.pasngr_seats ?? 0,
   });
 
+  const updateLatLng = useCallback(
+    (point: L.LatLng) => {
+      setLatLng(point);
+      setForm((prev) => ({
+        ...prev,
+        lat: point.lat,
+        lng: point.lng,
+      }));
+    },
+    [setForm]
+  );
+
   const handleSelectLocation = (lat: number, lng: number) => {
-    // move marker to selected location
-    setLatLng(Leaflet.latLng(lat, lng));
-    // move map to selected location
-    // setBounds(Leaflet.latLngBounds(Leaflet.latLng(lat, lng), Leaflet.latLng(lat, lng)));
-    mapRef?.current?.centerOn(Leaflet.latLng(lat, lng));
+    const point = Leaflet.latLng(lat, lng);
+    updateLatLng(point);
+    mapRef.current?.centerOn(point);
   };
 
   const isSubmitting = navigation.state === "submitting";
@@ -68,6 +81,19 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
       }));
     };
   }, [setForm]);
+
+  useEffect(() => {
+    if (actionData?.error) {
+      notify(t("error.network"), "error", { description: t("error.unableToUpdateOffer") });
+    }
+  }, [actionData, notify, t]);
+
+  useEffect(() => {
+    const error = (fetcher.data as { error?: string } | undefined)?.error;
+    if (fetcher.state === "idle" && error) {
+      notify(t("error.network"), "error", { description: t("error.unableToDeleteOffer") });
+    }
+  }, [fetcher.data, fetcher.state, notify, t]);
 
   return (
     <div className="mx-auto p-4">
@@ -139,8 +165,9 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
           </label>
 
           <CoordinatesInput
-            setLatLng={setLatLng}
+            setLatLng={updateLatLng}
             latLng={latLng}
+            label={t("offerForm.labels.coordinates")}
             inputId="offer-coordinates"
             latFieldName="lat"
             lngFieldName="lng"
@@ -159,7 +186,7 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
             event={event}
             // onBoundsChange={setBounds}
             initialPosition={latLng}
-            setLocation={setLatLng}
+            setLocation={updateLatLng}
             className="mb-4 h-96 w-full overflow-hidden bg-black/30"
           />
         </Suspense>

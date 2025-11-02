@@ -8,6 +8,7 @@ import { store } from "@/store/store";
 import { api } from "@/store/api";
 import { useOfferTokenCapture } from "@/hooks/useOfferTokenCapture";
 import { appendNotice } from "@/utils/url";
+import { MutationError, mutationErrorResponse } from "@/utils/runApi";
 
 export function Component() {
   // get event from parent route loader data
@@ -35,13 +36,20 @@ export async function action({ params, request }: ActionFunctionArgs) {
     throw new Response("Missing offer ID", { status: 400 });
   }
 
-  if (request.method === "DELETE") {
-    await deleteOffer(eventHash, offerId);
-    return redirect(appendNotice(`/events/${eventHash}`, "offer_deleted"));
-  }
+  try {
+    if (request.method === "DELETE") {
+      await deleteOffer(eventHash, offerId);
+      return redirect(appendNotice(`/events/${eventHash}`, "offer_deleted"));
+    }
 
-  await updateOffer(eventHash, offerId, formData);
-  return redirect(appendNotice(`/events/${eventHash}/offers/${offerId}`, "offer_updated"));
+    await updateOffer(eventHash, offerId, formData);
+    return redirect(appendNotice(`/events/${eventHash}/offers/${offerId}`, "offer_updated"));
+  } catch (error) {
+    if (error instanceof MutationError) {
+      return mutationErrorResponse(error);
+    }
+    throw error;
+  }
 }
 
 async function deleteOffer(eventHash: string, offerId: number) {

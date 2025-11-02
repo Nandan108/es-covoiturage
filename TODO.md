@@ -1,5 +1,6 @@
 # TODO
 19. Add events/import route triggering Event::importEventsFromMainSite()
+22. In AdminEventsPage, append " (private)" to private events' name
 17. Once all old offers without token_hash have expired, make token_hash non-nullable in DB,
     and remove code that works with null token_hash:
     - api: Offer::tokenIsValid(), testLegacyOffersWithoutTokenCanBeUpdated()
@@ -28,3 +29,4 @@
 18. Fix console complaint about missing fallbackElement
 20. Perf: split map bundle and optimise hydration
 21. Add event map to admin event form.
+23. Refactor mutation error handling to show notification instead of error page.
