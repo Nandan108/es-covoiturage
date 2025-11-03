@@ -11,6 +11,7 @@ import {
 import { Form, useActionData, useFetcher, useNavigation } from "react-router";
 import type { AdminEventFormValues, AdminEventType } from "@/admin/types";
 import { useI18n } from "@/i18n/I18nProvider";
+import type { TranslationKey } from "@/i18n/translations";
 import { getImageUrl } from "@/store/api";
 import LocationSearch from "@/components/locationSearch";
 import { Legend } from "@/components/map/Legend";
@@ -75,18 +76,35 @@ function AdminEventForm({
 
   const isDeleting = deleteFetcher.state === "submitting";
 
+  const showError = useCallback(
+    (message: string | undefined, descriptionKey: TranslationKey) => {
+      if (!message) return;
+      const normalized = message.trim();
+      const isOffline =
+        normalized === "error.network" ||
+        normalized === "Network error" ||
+        normalized === "TypeError: Failed to fetch" ||
+        normalized === "Failed to fetch";
+
+      if (isOffline) {
+        notify(t("error.offlineTitle"), "error", { description: t(descriptionKey) });
+      } else {
+        notify(normalized, "error");
+      }
+    },
+    [notify, t]
+  );
+
   useEffect(() => {
-    if (actionData?.error) {
-      notify(t("error.network"), "error", { description: t("error.unableToUpdateEvent") });
-    }
-  }, [actionData, notify, t]);
+    showError(actionData?.error, "error.unableToUpdateEvent");
+  }, [actionData, showError]);
 
   useEffect(() => {
     const error = (deleteFetcher.data as { error?: string } | undefined)?.error;
-    if (deleteFetcher.state === "idle" && error) {
-      notify(t("error.network"), "error", { description: t("error.unableToDeleteEvent") });
+    if (deleteFetcher.state === "idle") {
+      showError(error, "error.unableToDeleteEvent");
     }
-  }, [deleteFetcher.data, deleteFetcher.state, notify, t]);
+  }, [deleteFetcher.data, deleteFetcher.state, showError]);
 
   const updateValue = (
     key: keyof AdminEventFormValues,

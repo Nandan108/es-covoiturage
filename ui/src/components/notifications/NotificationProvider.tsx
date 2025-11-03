@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
+import LoadingTimer from "../LoadingTimer";
 
 /* eslint-disable react-refresh/only-export-components */
 
@@ -10,10 +11,11 @@ type Notification = {
   description?: string;
   type: NotificationType;
   isVisible: boolean;
+  duration: number;
 };
 
 type NotificationContextValue = {
-  notify: (message: string, type?: NotificationType, opts?: { description?: string }) => void;
+  notify: (message: string, type?: NotificationType, opts?: { description?: string; duration?: number }) => void;
 };
 
 const NotificationContext = createContext<NotificationContextValue>({
@@ -48,9 +50,17 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   );
 
   const notify = useCallback(
-    (message: string, type: NotificationType = "success", opts?: { description?: string }) => {
+    (
+      message: string,
+      type: NotificationType = "success",
+      opts?: { description?: string; duration?: number },
+    ) => {
       const id = ++counter.current;
-      setItems((prev) => [...prev, { id, message, description: opts?.description, type, isVisible: false }]);
+      const duration = opts?.duration ?? NOTIFICATION_TIMEOUT;
+      setItems((prev) => [
+        ...prev,
+        { id, message, description: opts?.description, type, isVisible: false, duration },
+      ]);
       // The double requestAnimationFrame ensures the toast renders once in
       // its hidden state before animating to visible
       requestAnimationFrame(() => {
@@ -60,7 +70,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           );
         });
       });
-      timers.current[id] = setTimeout(() => beginHide(id), NOTIFICATION_TIMEOUT);
+      timers.current[id] = setTimeout(() => beginHide(id), duration);
     },
     [beginHide],
   );
@@ -74,22 +84,30 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         {items.map((item) => (
           <div
             key={item.id}
-            className={`pointer-events-auto flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-bold text-white shadow-lg transition-all duration-300
+            className={`pointer-events-auto flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-bold text-white shadow-lg transition-all duration-300
               ${item.type === "error" ? "bg-red-400/80" : "bg-emerald-600/80"}
               ${item.isVisible ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0"}`}
           >
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-1 flex-col gap-1">
               <span>{item.message}</span>
               {item.description && (
-                <span className="text-xs font-bold text-white/90">{item.description}</span>
+                <span className="text-xs font-semibold text-white/90">{item.description}</span>
               )}
             </div>
             <button
               type="button"
-              className="ml-3 text-white/70 hover:text-white"
+              className="ml-3 inline-flex items-center justify-center rounded-full bg-white/10 text-white/80 transition hover:bg-white/20 hover:text-white"
               onClick={() => beginHide(item.id)}
             >
-              ×
+              <span className="relative block h-8 w-8 cursor-pointer">
+                <LoadingTimer
+                  duration={item.duration}
+                  color={item.type === "error" ? "#fecaca" : "#bbf7d0"}
+                  backgroundColor="rgba(255,255,255,0.25)"
+                  className="absolute inset-0"
+                />
+                <span className="absolute inset-0 flex items-center justify-center text-lg">×</span>
+              </span>
             </button>
           </div>
         ))}

@@ -8,6 +8,7 @@ import { Legend } from "./map/Legend";
 import EventCard from "./EventCard";
 import { FaTrash } from "react-icons/fa";
 import { useI18n } from "@/i18n/I18nProvider";
+import type { TranslationKey } from "@/i18n/translations";
 import type { MapActions } from "./map/EventMap";
 import CoordinatesInput from "./CoordinatesInput";
 import { useNotifications } from "@/components/notifications/NotificationProvider";
@@ -82,18 +83,34 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
     };
   }, [setForm]);
 
+  const showError = useCallback(
+    (message: string | undefined, descriptionKey: TranslationKey) => {
+      if (!message) return;
+      const normalized = message.trim();
+      const isOffline =
+        normalized === "error.network" ||
+        normalized === "Network error" ||
+        normalized.match(/failed to fetch/i);
+
+      if (isOffline) {
+        notify(t("error.offlineTitle"), "error", { description: t(descriptionKey) });
+      } else {
+        notify(normalized, "error");
+      }
+    },
+    [notify, t]
+  );
+
   useEffect(() => {
-    if (actionData?.error) {
-      notify(t("error.network"), "error", { description: t("error.unableToUpdateOffer") });
-    }
-  }, [actionData, notify, t]);
+    showError(actionData?.error, "error.unableToUpdateOffer");
+  }, [actionData, showError]);
 
   useEffect(() => {
     const error = (fetcher.data as { error?: string } | undefined)?.error;
-    if (fetcher.state === "idle" && error) {
-      notify(t("error.network"), "error", { description: t("error.unableToDeleteOffer") });
+    if (fetcher.state === "idle") {
+      showError(error, "error.unableToDeleteOffer");
     }
-  }, [fetcher.data, fetcher.state, notify, t]);
+  }, [fetcher.data, fetcher.state, showError]);
 
   return (
     <div className="mx-auto p-4">
