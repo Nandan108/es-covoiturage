@@ -2,6 +2,7 @@ import PageHeader from "@/components/layout/PageHeader";
 import { useRouteError, isRouteErrorResponse, useNavigate } from "react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/i18n/I18nProvider";
+import Footer from "@/components/layout/Footer";
 
 type DerivedError = {
   status: number;
@@ -123,6 +124,7 @@ function ErrorBoundary({ error }: { error?: Error }) {
           </>
         )}
       </main>
+      <Footer />
     </>
   );
 }

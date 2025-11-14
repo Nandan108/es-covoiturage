@@ -7,9 +7,11 @@ type RouterErrorResponse = { status: number; data?: unknown };
 const routeErrorRef = vi.hoisted<{ value: unknown }>(() => ({
   value: new Error("default"),
 }));
+const navigateMock = vi.hoisted(() => vi.fn());
 
 vi.mock("react-router", () => ({
   useRouteError: () => routeErrorRef.value,
+  useNavigate: () => navigateMock,
   isRouteErrorResponse: (error: unknown): error is RouterErrorResponse =>
     typeof error === "object" &&
     error !== null &&
@@ -40,7 +42,9 @@ describe("ErrorBoundary page", () => {
 
     render(<ErrorBoundary />);
 
-    expect(screen.getByText("Erreur 404")).toBeInTheDocument();
-    expect(screen.getByText("Introuvable")).toBeInTheDocument();
+    expect(screen.getByText("Page introuvable")).toBeInTheDocument();
+    expect(
+      screen.getByText("Elle a peut-être été déplacée ou le lien est incorrect.")
+    ).toBeInTheDocument();
   });
 });
