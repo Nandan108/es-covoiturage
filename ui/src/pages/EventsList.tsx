@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useLoaderData } from "react-router";
 import type { EventSummary } from "@/types/types";
 import { store } from "@/store/store";
@@ -9,6 +10,17 @@ import { runQuery } from "@/utils/runApi";
 
 export function Component() {
   const events = useLoaderData() as EventSummary[];
+  const prefetchEvent = api.usePrefetch("getEvent");
+
+  // Preload EventDetail componnet and first 3 events' details
+  // for faster navigation
+  useEffect(() => {
+    import("./EventDetail").catch(() => {});
+
+    events.slice(0, 3).forEach((event) => {
+      prefetchEvent(event.hashId, { ifOlderThan: 60 * 30 });
+    });
+  }, [events, prefetchEvent]);
 
   return <EventsList events={events} />;
 }
