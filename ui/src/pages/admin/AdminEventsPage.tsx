@@ -71,7 +71,9 @@ export function Component() {
                   </td>
                   <td className="px-4 py-3 font-medium text-slate-900">
                     <div className="flex flex-col">
-                      <span>{event.name}</span>
+                      <span>{event.name}
+                        <span className='font-bold italic'>{event.private && (" (" + t("admin.events.private") + ")")}</span>
+                      </span>
                       <span className="text-xs text-slate-500">{event.loc_name}</span>
                       <span className="text-xs text-slate-500">{event.loc_address}</span>
                     </div>

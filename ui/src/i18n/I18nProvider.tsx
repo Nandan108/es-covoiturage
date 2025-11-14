@@ -42,7 +42,7 @@ const getInitialLocale = (): Locale => {
   if (typeof window === "undefined") return "fr";
   const stored = window.localStorage.getItem(STORAGE_KEY);
   if (isLocale(stored)) return stored;
-  return navigator.language?.startsWith("en") ? "en" : "fr";
+  return "fr";
 };
 
 export const I18nProvider = ({ children }: { children: ReactNode }) => {

@@ -1,10 +1,9 @@
 # TODO
-19. Add events/import route triggering Event::importEventsFromMainSite()
-22. In AdminEventsPage, append " (private)" to private events' name
 17. Once all old offers without token_hash have expired, make token_hash non-nullable in DB,
     and remove code that works with null token_hash:
     - api: Offer::tokenIsValid(), testLegacyOffersWithoutTokenCanBeUpdated()
     - ui: OfferCard() { const canEdit; }, types.ts/Offer.token_hash
+25. update ci/cd to deploy to STAGING_DIR, then optionally, after human check, to PRODUCTION_DIR
 
 # DONE!
 01. Set up CI/CD
@@ -30,3 +29,5 @@
 20. Perf: split map bundle and optimise hydration
 21. Add event map to admin event form.
 23. Refactor mutation error handling to show notification instead of error page.
+19. Refactor events import system
+22. In AdminEventsPage, append " (private)" to private events' name
