@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminEventController;
 use App\Models\Image;
+use App\Services\EventImport\EventImporter;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 
@@ -41,4 +42,11 @@ Route::prefix('api/admin')->middleware('web')->group(function () {
         Route::get('me', [AdminAuthController::class, 'me']);
         Route::apiResource('events', AdminEventController::class);
     });
+});
+
+// allow executing import-events command from a URL
+Route::get('events/import', function (EventImporter $importer) {
+    $summary = $importer->import();
+
+    return response()->json($summary->toArray(), options: JSON_PRETTY_PRINT);
 });
