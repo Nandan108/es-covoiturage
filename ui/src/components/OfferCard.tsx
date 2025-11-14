@@ -34,9 +34,7 @@ function OfferCard({ offer: o }: { offer: Offer }) {
           </div>
         )}
         <Link to={`/events/${event.hashId}/offers/${o.id}`} className="block cursor-pointer">
-          <MdOutlineLocationSearching
-            className="fa-solid fa-magnifying-glass cursor-pointer"
-          />
+          <MdOutlineLocationSearching className="cursor-pointer"/>
         </Link>
         {canEdit ? (
           <Link to={`/events/${event.hashId}/offers/${o.id}/edit`} className="block cursor-pointer">

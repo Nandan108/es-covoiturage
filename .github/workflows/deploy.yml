@@ -58,12 +58,16 @@ jobs:
           CI: true
         run: npm test -- --run
 
-  deploy:
+  deploy-staging:
     runs-on: ubuntu-latest
     needs:
       - api-tests
       - ui-tests
-    environment: Infomaniak hosting
+    environment:
+      name: staging # Infomaniak hosting
+      url: ${{ vars.DEPLOY_URL }}
+    env:
+      DEPLOY_TARGET: ${{ vars.DEPLOY_DIR }}
     steps:
       - name: ⬇️ Checkout
         uses: actions/checkout@v4
@@ -79,7 +83,22 @@ jobs:
           npm ci
           npm run build
 
-      - name: 🚀 Upload UI to /public
+      - name: 📦 Upload UI build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-dist
+          path: ui/dist
+          retention-days: 1
+
+      - name: Validate deploy key
+        run: |
+          cat <<'EOF' > key.pem
+          ${{ secrets.DEPLOY_SSH_KEY }}
+          EOF
+          chmod 600 key.pem
+          ssh -i key.pem -o StrictHostKeyChecking=no ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} 'echo ok'
+
+      - name: 🚀 Upload UI to staging/public
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ vars.DEPLOY_HOST }}
@@ -87,17 +106,67 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           port: 22
           source: ui/dist/*
-          # Looks like it copies ui/dist/* to /public/ui/dist/* on server
-          target: ${{ vars.DEPLOY_DIR }}
+          # Copies artifacts on ui/dist/* to /public/ui/dist/* on server
+          target: ${{ env.DEPLOY_TARGET }}
 
-      - name: 🚀 Git fetch and reset on server
+      - name: 🚀 Git fetch and reset --hard on server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ vars.DEPLOY_HOST }}
           username: ${{ vars.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            cd ${{ vars.DEPLOY_DIR }}
+            cd ${{ env.DEPLOY_TARGET }}
+            rm -rf public/ # Clear out old files
+            git fetch origin
+            git reset --hard origin/main # public/ is re-created from repo
+            mv ui/dist/* public/ # Move built files to public/
+            cd api
+            /opt/php8.4/bin/composer install --no-dev --optimize-autoloader
+            /opt/php8.4/bin/php artisan migrate --force
+            /opt/php8.4/bin/php artisan config:clear
+            /opt/php8.4/bin/php artisan config:cache
+            /opt/php8.4/bin/php artisan route:clear
+            /opt/php8.4/bin/php artisan route:cache
+            /opt/php8.4/bin/php artisan view:clear
+            /opt/php8.4/bin/php artisan view:cache
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    environment:
+      name: production
+      url: ${{ vars.DEPLOY_URL }}
+    env:
+      DEPLOY_TARGET: ${{ vars.DEPLOY_DIR }}
+    steps:
+      - name: ⬇️ Checkout (production)
+        uses: actions/checkout@v4
+
+      - name: 📥 Download UI build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-dist
+          path: ui/dist
+
+      - name: 🚀 Upload UI to production/public
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ vars.DEPLOY_HOST }}
+          username: ${{ vars.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: 22
+          source: ui/dist/*
+          target: ${{ env.DEPLOY_TARGET }}
+
+      - name: 🚀 Git fetch and reset --hard on production server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ vars.DEPLOY_HOST }}
+          username: ${{ vars.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            cd ${{ env.DEPLOY_TARGET }}
             rm -rf public/ # Clear out old files
             git fetch origin
             git reset --hard origin/main # public/ is re-created from repo
