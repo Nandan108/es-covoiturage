@@ -151,6 +151,7 @@ final class OfferTest extends ApiTestCase
         $offerForUpdate = $event->offers()->inRandomOrder()->firstOrFail();
         $offerForDelete = $event->offers()->where('id', '!=', $offerForUpdate->id)->firstOrFail();
 
+        /** @var User */
         $admin = User::factory()->create(['is_admin' => true]);
 
         $updateUri = route('events.offers.update', ['event' => $event->hashId, 'offer' => $offerForUpdate->id]);

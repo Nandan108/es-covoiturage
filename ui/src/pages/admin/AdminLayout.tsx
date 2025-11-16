@@ -1,4 +1,4 @@
-import { Navigate, Outlet, useNavigate, useOutletContext } from "react-router";
+import { Navigate, Outlet, useLocation, useNavigate, useOutletContext } from "react-router";
 import { useDispatch } from "react-redux";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { type AdminUser, adminApi, useCurrentAdminQuery, useLogoutMutation } from "@/admin/api";
@@ -21,6 +21,7 @@ const isUnauthorizedError = (error: unknown): error is FetchBaseQueryError =>
 function AdminLayout() {
   const { t } = useI18n();
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const { data: admin, isLoading, error, refetch } = useCurrentAdminQuery();
   const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
@@ -42,7 +43,13 @@ function AdminLayout() {
 
   if (!admin) {
     if (isUnauthorizedError(error)) {
-      return <Navigate to="/admin/login" replace />;
+      return (
+        <Navigate
+          to="/admin/login"
+          replace
+          state={{ from: location.pathname + location.search }}
+        />
+      );
     }
     return (
       <div className="flex flex-col gap-4 p-10 text-center text-slate-600">

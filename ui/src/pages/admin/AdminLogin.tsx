@@ -1,5 +1,5 @@
-import { type FormEvent, useState } from "react";
-import { Navigate, useNavigate } from "react-router";
+import { type FormEvent, useMemo, useState } from "react";
+import { Navigate, useLocation, useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
 import { adminApi, useCurrentAdminQuery, useLoginMutation } from "@/admin/api";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -8,6 +8,7 @@ import type { AppDispatch } from "@/store/store";
 export function Component() {
   const { t } = useI18n();
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
   const { data: admin } = useCurrentAdminQuery();
   const [login, { isLoading }] = useLoginMutation();
@@ -15,8 +16,15 @@ export function Component() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  const redirectTo = useMemo(() => {
+    const state = location.state as { from?: string } | null;
+    const fromState = typeof state?.from === "string" ? state?.from : null;
+    const fromQuery = new URLSearchParams(location.search).get("from");
+    return fromState || fromQuery || "/admin/events";
+  }, [location.state, location.search]);
+
   if (admin) {
-    return <Navigate to="/admin/events" replace />;
+    return <Navigate to={redirectTo} replace />;
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -27,7 +35,7 @@ export function Component() {
       dispatch(
         adminApi.util.upsertQueryData("currentAdmin", undefined, response.admin),
       );
-      navigate("/admin/events", { replace: true });
+      navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(t("admin.login.error"));
       console.error(err);

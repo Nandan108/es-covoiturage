@@ -1,5 +1,4 @@
 # TODO
-32. Let admin pages redirect to admin/login for unauthenticated users.
 27. In admin/event edit form, show a table of offers, with edit link.
 28. Remove DB-storage of event images and clean up all related code.
 17. Once all old offers without token_hash have expired, make token_hash non-nullable in DB,
@@ -38,4 +37,5 @@
     scroll up to top of map, so that the target offer is visible.
 31. Make notification flash toast visible over map (update z-index).
 26. Allow logged-in admins to update/delete any existing offer.
+32. Let admin pages redirect to admin/login for unauthenticated users.
 

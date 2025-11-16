@@ -8,6 +8,7 @@ import { store } from "@/store/store";
 import { MutationError, mutationErrorResponse, runMutation } from "@/utils/runApi";
 import { formDataToEventValues } from "@/admin/formData";
 import { appendNotice } from "@/utils/url";
+import { redirectToAdminLogin } from "@/admin/redirect";
 
 /* eslint-disable react-refresh/only-export-components */
 
@@ -37,6 +38,9 @@ export async function action({ request }: ActionFunctionArgs) {
     return redirect(appendNotice("/admin/events", "admin_event_created"));
   } catch (error) {
     if (error instanceof MutationError) {
+      if (error.status === 401) {
+        return redirectToAdminLogin(request);
+      }
       return mutationErrorResponse(error);
     }
     throw error;

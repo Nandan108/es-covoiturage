@@ -2,6 +2,7 @@
 
 namespace App\Http\Responses;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 
@@ -45,6 +46,15 @@ final class ProblemDetails
                 extra: [
                     'errors' => $e->errors(),
                 ],
+            );
+        }
+        if ($e instanceof AuthenticationException) {
+            return self::from(
+                type: 'about:blank',
+                title: self::getTitleForStatus(401),
+                status: 401,
+                detail: $e->getMessage(),
+                instance: $instance,
             );
         }
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { redirect, useLoaderData } from "react-router";
 import { adminApi } from "@/admin/api";
+import { redirectToAdminLogin } from "@/admin/redirect";
 import type { AdminEvent, AdminEventFormValues } from "@/admin/types";
 import AdminEventForm from "./AdminEventForm";
 import { store } from "@/store/store";
@@ -52,13 +53,20 @@ const buildFormValues = (event: AdminEvent): AdminEventFormValues => ({
   image: null,
 });
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
   const hashId = params.eventId;
   if (!hashId) {
     throw new Response("Événement introuvable", { status: 404 });
   }
   const sub = store.dispatch(adminApi.endpoints.getEvent.initiate(hashId));
-  return runQuery(sub, "Événement introuvable", 404);
+  try {
+    return await runQuery(sub, "Événement introuvable", 404);
+  } catch (error) {
+    if (error instanceof Response && error.status === 401) {
+      throw redirectToAdminLogin(request);
+    }
+    throw error;
+  }
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
@@ -82,6 +90,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
     return redirect(appendNotice("/admin/events", "admin_event_updated"));
   } catch (error) {
     if (error instanceof MutationError) {
+      if (error.status === 401) {
+        return redirectToAdminLogin(request);
+      }
       return mutationErrorResponse(error);
     }
     throw error;

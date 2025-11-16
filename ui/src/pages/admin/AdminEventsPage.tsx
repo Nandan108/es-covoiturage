@@ -1,11 +1,12 @@
 import { useMemo } from "react";
-import { Link, useLoaderData } from "react-router";
+import { Link, useLoaderData, type LoaderFunctionArgs } from "react-router";
 import type { AdminEvent } from "@/admin/types";
 import { adminApi } from "@/admin/api";
 import { store } from "@/store/store";
 import { runQuery } from "@/utils/runApi";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getImageUrl } from "@/store/api";
+import { redirectToAdminLogin } from "@/admin/redirect";
 
 /* eslint-disable react-refresh/only-export-components */
 
@@ -132,7 +133,14 @@ export function Component() {
   );
 }
 
-export async function loader() {
+export async function loader({ request }: LoaderFunctionArgs) {
   const sub = store.dispatch(adminApi.endpoints.listEvents.initiate());
-  return runQuery(sub, "Impossible de charger les événements", 500);
+  try {
+    return await runQuery(sub, "Impossible de charger les événements", 500);
+  } catch (error) {
+    if (error instanceof Response && error.status === 401) {
+      throw redirectToAdminLogin(request);
+    }
+    throw error;
+  }
 }
