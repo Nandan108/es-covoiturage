@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminEventController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\OfferController;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -26,6 +27,8 @@ $webMiddleware = [
 // - Events
 Route::resource('events', EventController::class)
     ->only(['index', 'show']);
+Route::post('contact', ContactController::class)
+    ->name('contact.submit');
 
 // - Offers + Admin API (both need session-authenticated admin access)
 Route::middleware($webMiddleware)->group(function () {

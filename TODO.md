@@ -38,4 +38,4 @@
 31. Make notification flash toast visible over map (update z-index).
 26. Allow logged-in admins to update/delete any existing offer.
 32. Let admin pages redirect to admin/login for unauthenticated users.
-
+33. Add a contact form and a contact link in footer
