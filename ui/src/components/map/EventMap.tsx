@@ -1,5 +1,5 @@
 // src/components/map/EventMap.tsx
-import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type L from "leaflet";
@@ -84,6 +84,32 @@ const EventMap = forwardRef<MapActions, Props>(function (
 
   const MapApi = () => {
     const map = useMap();
+    const isInteractingRef = useRef(false);
+
+    useEffect(() => {
+      const startInteraction = () => {
+        isInteractingRef.current = true;
+      };
+      const endInteraction = () => {
+        isInteractingRef.current = false;
+      };
+
+      map.on("movestart", startInteraction);
+      map.on("dragstart", startInteraction);
+      map.on("zoomstart", startInteraction);
+      map.on("moveend", endInteraction);
+      map.on("dragend", endInteraction);
+      map.on("zoomend", endInteraction);
+
+      return () => {
+        map.off("movestart", startInteraction);
+        map.off("dragstart", startInteraction);
+        map.off("zoomstart", startInteraction);
+        map.off("moveend", endInteraction);
+        map.off("dragend", endInteraction);
+        map.off("zoomend", endInteraction);
+      };
+    }, [map]);
 
     // Store currently open popup + its marker position
     const lastPopupRef = useRef<{ popup: L.Popup; marker: L.Marker; cleanup: () => void } | null>(null);
@@ -112,9 +138,16 @@ const EventMap = forwardRef<MapActions, Props>(function (
         map.off("zoomend", checkPopupPosition);
       };
       const checkPopupPosition = () => {
+        if (isInteractingRef.current) return;
+        if (!map.getPanes()?.mapPane) return;
+
         if (!map.getBounds().contains(marker.getLatLng())) {
           cleanup();
-          marker.closePopup();
+          requestAnimationFrame(() => {
+            if (map.getPanes()?.mapPane) {
+              marker.closePopup();
+            }
+          });
         }
       };
 

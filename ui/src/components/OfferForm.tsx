@@ -190,6 +190,7 @@ export default function OfferForm({ event, offer }: { event: EventDetail; offer?
             lngFieldName="lng"
             inputClassName="input"
             labelClassName="col-span-2"
+            required
           />
         </div>
 
