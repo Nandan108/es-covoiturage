@@ -1,7 +1,4 @@
 # TODO
-30. In offer card, when clicking on MdOutlineLocationSearching button, make sure to
-    scroll up to top of map, so that the target offer is visible.
-31. Make notification flash toast visible over map (update z-index).
 26. Allow logged-in admins to update/delete any existing offer.
 27. In admin/event edit form, show a table of offers, with edit link.
 28. Remove DB-storage of event images and clean up all related code.
@@ -37,4 +34,7 @@
 19. Refactor events import system
 22. In AdminEventsPage, append " (private)" to private events' name
 25. update ci/cd to deploy to staging and production environments sequentially
+30. When clicking on offer card's marker locator button, make sure to
+    scroll up to top of map, so that the target offer is visible.
+31. Make notification flash toast visible over map (update z-index).
 

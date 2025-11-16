@@ -30,6 +30,7 @@ type Props = {
   setLocation?: (latLng: L.LatLng) => void; // if set, allow user to pick location
   mode?: MapMode;
   editingOffer?: Optionalize<Offer, "id" | 'lat' | 'lng' | "created_at" | "updated_at" | "token_hash" | "token_expires_at">;
+  onOfferPopupClose?: (offerId: number) => void;
 };
 
 function getRoleNameKey(o: { pasngr_seats: number; driver_seats: number }) {
@@ -50,6 +51,7 @@ const EventMap = forwardRef<MapActions, Props>(function (
     initialPosition,
     mode = "view",
     editingOffer,
+    onOfferPopupClose,
   },
   ref
 ) {
@@ -70,11 +72,21 @@ const EventMap = forwardRef<MapActions, Props>(function (
   }
 
   // Bridge to Leaflet Map instance
+  const getOfferIdForMarker = (marker: L.Marker | undefined | null) => {
+    if (!marker) return null;
+    for (const [offerId, registeredMarker] of markersRef.current.entries()) {
+      if (registeredMarker === marker) {
+        return offerId;
+      }
+    }
+    return null;
+  };
+
   const MapApi = () => {
     const map = useMap();
 
     // Store currently open popup + its marker position
-    const lastPopupRef = useRef<{ popup: L.Popup; marker: L.Marker } | null>(null);
+    const lastPopupRef = useRef<{ popup: L.Popup; marker: L.Marker; cleanup: () => void } | null>(null);
 
     // If the map moves such that the open popup's marker is out of view, close it
     // Leaflet doesn't do this automatically, and if we don't do it the map moves
@@ -84,18 +96,47 @@ const EventMap = forwardRef<MapActions, Props>(function (
       const marker = (popup as { _source?: L.Marker })._source;
       if (!marker || typeof marker.getLatLng !== "function") return;
 
-      lastPopupRef.current = { popup, marker };
+      // make sure map is scrolled into view if popup is opened offscreen
+      const container = map.getContainer();
+      const rect = container.getBoundingClientRect();
+      if (rect.top < 0) {
+        container.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
 
+      // Clean up any prior popup watchers
+      lastPopupRef.current?.cleanup();
+
+      // Set up new popup watcher
+      const cleanup = () => {
+        map.off("moveend", checkPopupPosition);
+        map.off("zoomend", checkPopupPosition);
+      };
       const checkPopupPosition = () => {
         if (!map.getBounds().contains(marker.getLatLng())) {
+          cleanup();
           marker.closePopup();
-          map.off("move", checkPopupPosition);
-          map.off("zoomend", checkPopupPosition);
         }
       };
 
-      map.on("move", checkPopupPosition);
+      lastPopupRef.current = { popup, marker, cleanup };
+
+      map.on("moveend", checkPopupPosition);
       map.on("zoomend", checkPopupPosition);
+    });
+
+    map.on("popupclose", (e) => {
+      const popup = e.popup;
+      const marker = (popup as { _source?: L.Marker })._source;
+
+      if (lastPopupRef.current?.popup === popup) {
+        lastPopupRef.current.cleanup();
+        lastPopupRef.current = null;
+      }
+
+      const closedOfferId = getOfferIdForMarker(marker);
+      if (closedOfferId != null) {
+        onOfferPopupClose?.(closedOfferId);
+      }
     });
 
     // Expose imperative API to parent via ref

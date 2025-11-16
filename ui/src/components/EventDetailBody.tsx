@@ -3,7 +3,7 @@ import { usePartitionOffersByBounds } from "@/hooks/usePartitionOffersByBounds"
 import { OffersGrid } from "./map/OffersGrid"
 import type { EventDetail } from "@/types/types"
 import EventCard from "./EventCard"
-import { Link } from "react-router"
+import { Link, useNavigate } from "react-router"
 import { Legend } from "./map/Legend"
 import type { MapActions } from "./map/EventMap"
 import Leaflet from "leaflet";
@@ -22,10 +22,15 @@ function EventDetailBody({ event, offerId }: { event: EventDetail, offerId: numb
   const mapRef = useRef<MapActions | null>(null)
   const [mapReady, setMapReady] = useState(false);
   const { t } = useI18n();
+  const navigate = useNavigate();
   const handleMapRef = useCallback((instance: MapActions | null) => {
     mapRef.current = instance;
     setMapReady(instance !== null);
   }, []);
+  const handleOfferPopupClose = useCallback((closedOfferId: number) => {
+    if (offerId !== closedOfferId) return;
+    navigate(`/events/${event.hashId}`, { replace: true });
+  }, [offerId, event.hashId, navigate]);
 
   // On page load and on change of offerId value,
   // focus on the corresponding offer, if offerId is set
@@ -70,6 +75,7 @@ function EventDetailBody({ event, offerId }: { event: EventDetail, offerId: numb
             event={event}
             initialPosition={initialPosition}
             onBoundsChange={setBounds}
+            onOfferPopupClose={handleOfferPopupClose}
             className="mb-4 h-96 w-full overflow-hidden bg-black/30"
           />
         </Suspense>

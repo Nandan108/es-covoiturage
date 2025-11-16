@@ -7,6 +7,7 @@ import type L from "leaflet";
 
 type EventMapMockProps = {
   onBoundsChange: (bounds: L.LatLngBounds) => void;
+  onOfferPopupClose?: (offerId: number) => void;
 } & Record<string, unknown>;
 
 const state = vi.hoisted(() => ({
@@ -14,6 +15,7 @@ const state = vi.hoisted(() => ({
   focusOfferMock: vi.fn(),
   offersGridCalls: [] as Array<{ title: string; offers: Offer[]; dim?: boolean }>,
   latestMapProps: null as EventMapMockProps | null,
+  navigateMock: vi.fn(),
 }));
 
 vi.mock("leaflet", () => {
@@ -68,6 +70,7 @@ vi.mock("react-router", () => ({
       {children}
     </a>
   ),
+  useNavigate: () => state.navigateMock,
 }));
 
 function makeOffer(overrides: Partial<Offer> = {}): Offer {
@@ -119,6 +122,7 @@ describe("EventDetailBody", () => {
     state.focusOfferMock.mockReset();
     state.offersGridCalls.length = 0;
     state.latestMapProps = null;
+    state.navigateMock.mockReset();
     globalThis.requestAnimationFrame = (cb: FrameRequestCallback): number => {
       cb(0);
       return 0;
@@ -192,5 +196,28 @@ describe("EventDetailBody", () => {
       offers: offers.slice(2),
       dim: true,
     });
+  });
+
+  it("navigates back to the base event URL when the selected offer popup closes", () => {
+    const event = makeEvent({
+      hashId: "event_123",
+      offers: [
+        makeOffer({ id: 10, name: "Offre ciblée" }),
+        makeOffer({ id: 20, name: "Autre" }),
+      ],
+    });
+
+    state.partitionMock.mockReturnValue({ inBounds: event.offers, outOfBounds: [] });
+
+    render(<EventDetailBody event={event} offerId={10} />);
+
+    expect(state.latestMapProps?.onOfferPopupClose).toBeTruthy();
+    state.latestMapProps?.onOfferPopupClose?.(10);
+
+    expect(state.navigateMock).toHaveBeenCalledWith("/events/event_123", { replace: true });
+
+    state.navigateMock.mockClear();
+    state.latestMapProps?.onOfferPopupClose?.(20);
+    expect(state.navigateMock).not.toHaveBeenCalled();
   });
 });
