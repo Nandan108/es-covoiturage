@@ -1,6 +1,4 @@
 # TODO
-27. In admin/event edit form, show a table of offers, with edit link.
-28. Remove DB-storage of event images and clean up all related code.
 17. Once all old offers without token_hash have expired, make token_hash non-nullable in DB,
     and remove code that works with null token_hash:
     - api: Offer::tokenIsValid(), testLegacyOffersWithoutTokenCanBeUpdated()
@@ -39,3 +37,4 @@
 26. Allow logged-in admins to update/delete any existing offer.
 32. Let admin pages redirect to admin/login for unauthenticated users.
 33. Add a contact form and a contact link in footer
+28. Remove DB-storage of event images and clean up all related code.

@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Image;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\File;
 
 /**
  * @extends Factory<Image>
@@ -20,8 +21,8 @@ class ImageFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->unique()->lexify('test-image-??????').'.jpg',
-            'file' => base64_encode($this->faker->randomHtml(1, 1)),
+            'name'  => $this->faker->unique()->lexify('test-image-??????').'.jpg',
+            'crc32' => 0,
         ];
     }
 
@@ -32,7 +33,12 @@ class ImageFactory extends Factory
     public function configure(): static
     {
         return $this->afterCreating(static function (Image $image): void {
-            $image->ensureStoredLocally();
+            $binary = random_bytes(128);
+            $path = $image->storagePath();
+            File::ensureDirectoryExists(dirname($path));
+            File::put($path, $binary);
+            $image->crc32 = (int) sprintf('%u', crc32($binary));
+            $image->save();
         });
     }
 }

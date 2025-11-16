@@ -19,7 +19,6 @@ Route::get('/images/events/{filename}', function (string $filename) {
         abort(404);
     }
 
-    $image->ensureStoredLocally();
     $path = $image->storagePath();
     if (!File::exists($path)) {
         abort(404);

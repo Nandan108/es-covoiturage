@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
-use App\Models\Image;
+use App\Services\Image\ImageStorageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -13,6 +13,11 @@ use Illuminate\Validation\Rule;
 /** @psalm-suppress UnusedClass */
 final class AdminEventController extends Controller
 {
+    public function __construct(
+        private readonly ImageStorageService $imageStorage,
+    ) {
+    }
+
     public function index(): JsonResponse
     {
         $events = Event::query()
@@ -82,17 +87,7 @@ final class AdminEventController extends Controller
 
         $imgFile = $request->file('image');
         if ($imgFile instanceof UploadedFile && $imgFile->isValid()) {
-            $fileContents = $imgFile->get();
-            $b64Image = base64_encode(false === $fileContents ? '' : $fileContents);
-            /** @psalm-suppress UndefinedMagicMethod*/
-            $image = Image::whereRaw('crc32(file) = ?', crc32($b64Image))->first();
-            if (!$image) {
-                $image = Image::create([
-                    'name' => $imgFile->getClientOriginalName(),
-                    'file' => $b64Image,
-                ]);
-                $image->ensureStoredLocally();
-            }
+            $image = $this->imageStorage->storeFromUpload($imgFile);
             $data['image_id'] = $image->id;
         }
 

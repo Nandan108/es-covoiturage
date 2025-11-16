@@ -3,32 +3,27 @@
 namespace App\Services\EventImport;
 
 use App\Models\Image;
+use App\Services\Image\ImageStorageService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 final class EventImageResolver
 {
+    /** @psalm-suppress PossiblyUnusedMethod */
+    public function __construct(
+        private readonly ImageStorageService $imageStorage,
+    ) {
+    }
+
     public function resolve(string $imagePath): Image
     {
-        $filename = basename($imagePath);
-
-        $existing = Image::where('name', '=', $filename)->first();
-        if ($existing) {
-            $existing->ensureStoredLocally();
-
-            return $existing;
+        $content = $this->downloadImage($imagePath);
+        $originalName = basename($this->normalizeUrl($imagePath));
+        if ('' === $originalName || false === strpos($originalName, '.')) {
+            $originalName = 'imported.jpg';
         }
 
-        $content = $this->downloadImage($imagePath);
-
-        $image = Image::create([
-            'name' => $filename,
-            'file' => base64_encode($content),
-        ]);
-
-        $image->ensureStoredLocally();
-
-        return $image;
+        return $this->imageStorage->storeFromBinary($content, $originalName);
     }
 
     /**
