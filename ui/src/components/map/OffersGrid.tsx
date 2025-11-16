@@ -5,10 +5,12 @@ export function OffersGrid({
   title,
   offers,
   dim,
+  isAdmin = false,
 }: {
   title: string;
   offers: Offer[];
   dim?: boolean;
+  isAdmin?: boolean;
 }) {
   return (
     <>
@@ -19,7 +21,7 @@ export function OffersGrid({
         }`}
       >
         {offers.map((o) => (
-          <OfferCard key={o.id} offer={o} />
+          <OfferCard key={o.id} offer={o} canAdminEdit={isAdmin} />
         ))}
       </div>
     </>

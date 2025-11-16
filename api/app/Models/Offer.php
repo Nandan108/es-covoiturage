@@ -7,6 +7,7 @@ use Database\Factories\OfferFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @property int         $id
@@ -64,6 +65,10 @@ final class Offer extends Model
 
     public function tokenIsValid(?string $token): bool
     {
+        if (Auth::guard('admin')->check()) {
+            return true;
+        }
+
         if (null === $this->token_hash) {
             return true; // legacy offers: no token required
         }

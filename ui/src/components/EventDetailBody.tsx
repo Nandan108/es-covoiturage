@@ -8,6 +8,7 @@ import { Legend } from "./map/Legend"
 import type { MapActions } from "./map/EventMap"
 import Leaflet from "leaflet";
 import { useI18n } from "@/i18n/I18nProvider";
+import { useCurrentAdminQuery } from "@/admin/api";
 
 const EventMap = lazy(() => import("./map/EventMap"));
 
@@ -23,6 +24,8 @@ function EventDetailBody({ event, offerId }: { event: EventDetail, offerId: numb
   const [mapReady, setMapReady] = useState(false);
   const { t } = useI18n();
   const navigate = useNavigate();
+  const { data: adminData } = useCurrentAdminQuery();
+  const isAdmin = Boolean(adminData);
   const handleMapRef = useCallback((instance: MapActions | null) => {
     mapRef.current = instance;
     setMapReady(instance !== null);
@@ -82,8 +85,8 @@ function EventDetailBody({ event, offerId }: { event: EventDetail, offerId: numb
       </div>
 
       <div className="offers-container">
-        <OffersGrid title={t("events.offers.inBounds")} offers={inBounds} />
-        <OffersGrid title={t("events.offers.outOfBounds")} offers={outOfBounds} dim />
+        <OffersGrid title={t("events.offers.inBounds")} offers={inBounds} isAdmin={isAdmin} />
+        <OffersGrid title={t("events.offers.outOfBounds")} offers={outOfBounds} dim isAdmin={isAdmin} />
       </div>
     </div>
   )

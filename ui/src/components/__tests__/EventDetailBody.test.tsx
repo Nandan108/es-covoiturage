@@ -13,9 +13,10 @@ type EventMapMockProps = {
 const state = vi.hoisted(() => ({
   partitionMock: vi.fn(),
   focusOfferMock: vi.fn(),
-  offersGridCalls: [] as Array<{ title: string; offers: Offer[]; dim?: boolean }>,
+  offersGridCalls: [] as Array<{ title: string; offers: Offer[]; dim?: boolean; isAdmin?: boolean }>,
   latestMapProps: null as EventMapMockProps | null,
   navigateMock: vi.fn(),
+  adminQueryMock: vi.fn(),
 }));
 
 vi.mock("leaflet", () => {
@@ -48,7 +49,7 @@ vi.mock("@/components/map/EventMap", () => {
 });
 
 vi.mock("@/components/map/OffersGrid", () => ({
-  OffersGrid: (props: { title: string; offers: Offer[]; dim?: boolean }) => {
+  OffersGrid: (props: { title: string; offers: Offer[]; dim?: boolean; isAdmin?: boolean }) => {
     state.offersGridCalls.push(props);
     return (
       <div data-testid={`grid-${props.title}`} data-dimmed={props.dim ? "true" : "false"}>
@@ -62,6 +63,10 @@ vi.mock("@/components/map/OffersGrid", () => ({
 
 vi.mock("@/components/map/Legend", () => ({
   Legend: () => <div data-testid="legend" />,
+}));
+
+vi.mock("@/admin/api", () => ({
+  useCurrentAdminQuery: () => state.adminQueryMock(),
 }));
 
 vi.mock("react-router", () => ({
@@ -123,6 +128,8 @@ describe("EventDetailBody", () => {
     state.offersGridCalls.length = 0;
     state.latestMapProps = null;
     state.navigateMock.mockReset();
+    state.adminQueryMock.mockReset();
+    state.adminQueryMock.mockReturnValue({ data: null });
     globalThis.requestAnimationFrame = (cb: FrameRequestCallback): number => {
       cb(0);
       return 0;

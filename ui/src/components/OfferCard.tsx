@@ -9,9 +9,9 @@ import { ImBubble2 } from "react-icons/im";
 import { FaRegEdit } from "react-icons/fa";
 
 
-function OfferCard({ offer: o }: { offer: Offer }) {
+function OfferCard({ offer: o, canAdminEdit = false }: { offer: Offer; canAdminEdit?: boolean }) {
   const event = useRouteLoaderData("event-detail") as EventDetail;
-  const canEdit = !o.token_hash || Boolean(getOfferToken(o.id));
+  const canEdit = canAdminEdit || !o.token_hash || Boolean(getOfferToken(o.id));
   const { t } = useI18n();
 
   return (

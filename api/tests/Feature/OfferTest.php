@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Mail\OfferAccessMail;
 use App\Models\Offer;
+use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 
@@ -142,5 +143,27 @@ final class OfferTest extends ApiTestCase
         $uri = route('events.offers.update', ['event' => $event->hashId, 'offer' => $offer->id]);
         $this->patchJson($uri, ['name' => 'Legacy update'])
             ->assertOk();
+    }
+
+    public function testAdminCanModifyOffersWithoutOwnerToken(): void
+    {
+        $event = $this->randomEvent();
+        $offerForUpdate = $event->offers()->inRandomOrder()->firstOrFail();
+        $offerForDelete = $event->offers()->where('id', '!=', $offerForUpdate->id)->firstOrFail();
+
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $updateUri = route('events.offers.update', ['event' => $event->hashId, 'offer' => $offerForUpdate->id]);
+        $this->actingAs($admin, 'admin')
+            ->patchJson($updateUri, ['name' => 'Updated by admin'])
+            ->assertOk()
+            ->assertJsonPath('offer.name', 'Updated by admin');
+
+        $deleteUri = route('events.offers.destroy', ['event' => $event->hashId, 'offer' => $offerForDelete->id]);
+        $this->actingAs($admin, 'admin')
+            ->deleteJson($deleteUri)
+            ->assertOk();
+
+        $this->assertDatabaseMissing('offers', ['id' => $offerForDelete->id]);
     }
 }

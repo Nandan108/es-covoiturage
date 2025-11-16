@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { OffersGrid } from "@/components/map/OffersGrid";
 import type { Offer } from "@/types/types";
 
-const mockOfferCard = vi.fn(({ offer }: { offer: Offer }) => (
+const mockOfferCard = vi.fn(({ offer }: { offer: Offer; canAdminEdit?: boolean }) => (
   <div data-testid="offer-card">{offer.name}</div>
 ));
 
@@ -57,5 +57,14 @@ describe("OffersGrid", () => {
 
     const grid = screen.getByTestId("offer-card").parentElement;
     expect(grid?.className).toContain("opacity-60");
+  });
+
+  it("passes the admin flag down to offer cards", () => {
+    const offers = [makeOffer()];
+    render(<OffersGrid title="Admin view" offers={offers} isAdmin />);
+
+    expect(mockOfferCard).toHaveBeenCalledWith(
+      expect.objectContaining({ offer: offers[0], canAdminEdit: true })
+    );
   });
 });
