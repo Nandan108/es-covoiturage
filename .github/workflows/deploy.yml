@@ -124,12 +124,7 @@ jobs:
             cd api
             /opt/php8.4/bin/composer install --no-dev --optimize-autoloader
             /opt/php8.4/bin/php artisan migrate --force
-            /opt/php8.4/bin/php artisan config:clear
-            /opt/php8.4/bin/php artisan config:cache
-            /opt/php8.4/bin/php artisan route:clear
-            /opt/php8.4/bin/php artisan route:cache
-            /opt/php8.4/bin/php artisan view:clear
-            /opt/php8.4/bin/php artisan view:cache
+            /opt/php8.4/bin/php artisan optimize
 
   deploy-production:
     runs-on: ubuntu-latest
@@ -174,9 +169,4 @@ jobs:
             cd api
             /opt/php8.4/bin/composer install --no-dev --optimize-autoloader
             /opt/php8.4/bin/php artisan migrate --force
-            /opt/php8.4/bin/php artisan config:clear
-            /opt/php8.4/bin/php artisan config:cache
-            /opt/php8.4/bin/php artisan route:clear
-            /opt/php8.4/bin/php artisan route:cache
-            /opt/php8.4/bin/php artisan view:clear
-            /opt/php8.4/bin/php artisan view:cache
+            /opt/php8.4/bin/php artisan optimize

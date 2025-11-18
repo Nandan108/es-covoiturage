@@ -35,14 +35,16 @@ Route::middleware($webMiddleware)->group(function () {
     Route::resource('events.offers', OfferController::class)
         ->only(['show', 'store', 'update', 'destroy']);
 
-    Route::prefix('admin')->group(function () {
-        Route::post('login', [AdminAuthController::class, 'login'])->name('admin.login');
+    Route::prefix('admin')
+        ->name('admin.')
+        ->group(function () {
+            Route::post('login', [AdminAuthController::class, 'login'])->name('admin.login');
 
-        // Protected Admin Routes
-        Route::middleware('auth:admin')->group(function () {
-            Route::post('logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
-            Route::get('me', [AdminAuthController::class, 'me']);
-            Route::apiResource('events', AdminEventController::class);
+            // Protected Admin Routes
+            Route::middleware('auth:admin')->group(function () {
+                Route::post('logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+                Route::get('me', [AdminAuthController::class, 'me']);
+                Route::apiResource('events', AdminEventController::class);
+            });
         });
-    });
 });

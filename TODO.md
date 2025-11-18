@@ -9,8 +9,7 @@
 12. Fix: Unify error handling (i.e. leverage ErrorBoundary)
 13. Refact: use loader's return values rather than re-query
 11. Fix favicon
-05. Better nav (use NavLinks)
-    * breadcrumbs
+05. Better nav using NavLinks, breadcrumbs
 08. Show event name/image in offer form
 09. Show event name in page meta title
 03. Trash button on offer form in edit mode
@@ -31,10 +30,10 @@
 19. Refactor events import system
 22. In AdminEventsPage, append " (private)" to private events' name
 25. update ci/cd to deploy to staging and production environments sequentially
-30. When clicking on offer card's marker locator button, make sure to
-    scroll up to top of map, so that the target offer is visible.
+30. When an offer's popup is opened, scroll up to top of map, to ensure offer is visible
 31. Make notification flash toast visible over map (update z-index).
 26. Allow logged-in admins to update/delete any existing offer.
 32. Let admin pages redirect to admin/login for unauthenticated users.
-33. Add a contact form and a contact link in footer
+33. Add a contact form (dialog) and a contact link in footer
 28. Remove DB-storage of event images and clean up all related code.
+34. Add a complete README.md

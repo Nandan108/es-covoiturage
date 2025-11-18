@@ -67,6 +67,10 @@ const router = createBrowserRouter([
         lazy: async () => import("./pages/EventsList"),
       },
       {
+        path: "events",
+        lazy: async () => import("./pages/EventsList"),
+      },
+      {
         path: "/events/:id",
         id: "event-detail",
         lazy: async () => {
